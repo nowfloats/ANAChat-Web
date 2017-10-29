@@ -1,0 +1,18 @@
+md-form-field {
+  width: 100%;
+}
+
+agm-map {
+  height: 286px;
+  width: 237px;
+}
+
+md-list {
+  max-height: 80vh;
+  max-width: 90vh;
+  min-width: 200px;
+}
+
+md-list-item {
+  margin: 10px -16px;
+}

@@ -1,0 +1,14 @@
+@import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
+
+body {
+  font-family: 'Open Sans';
+  background-color: transparent;
+}
+
+md-checkbox {
+  font-weight: normal;
+}
+
+label {
+  font-weight: normal;
+}

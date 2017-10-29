@@ -1,0 +1,152 @@
+<div class="root" [ngClass]="{'ana-min': isMin}">
+    <div class="content">
+        <div class="ana-title">
+            <div class="ana-logo">
+                <img [src]="settings.brandingConfig.logoUrl" class="ana-full" />
+            </div>
+            <div class="ana-content">
+                <div class="title">{{settings.brandingConfig.agentName}}</div>
+                <div class="subtitle">{{settings.brandingConfig.agentDesc}} {{connectionStatusMessage()}}</div>
+            </div>
+            <div class="ana-actions" style="display: none">
+                <a class="ana-minmax-btn" href="javascript:;" (click)="setMin(!isMin)"></a>
+            </div>
+        </div>
+        <div class="chat-thread scrollbar" #chatThreadView>
+            <div class="chat-message" *ngFor="let msg of chatThread.messages">
+                <div [ngSwitch]="msg.messageData.type">
+                    <ng-container *ngSwitchCase="MH.MessageType.SIMPLE">
+                        <div class="chat-message-item-container">
+                            <div class="chat-message-item" [ngClass]="{'media': msg.getMessageContentType()==MH.MessageContentType.Media, 'text':msg.getMessageContentType()==MH.MessageContentType.Text, 'typing':msg.getMessageContentType()==MH.MessageContentType.Typing, 'incoming':msg.direction==MH.Direction.Incoming, 'outgoing':msg.direction==MH.Direction.Outgoing, 'chat-message-last': isLastInMessageGroup(msg)}">
+                                <div [ngSwitch]="msg.getMessageContentType()">
+                                    <ng-container *ngSwitchCase="MH.MessageContentType.Text">
+                                        <span class="chat-text">
+                                            {{msg.messageData.content.text}}
+                                        </span>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="MH.MessageContentType.Typing">
+                                        <div class="typing-indicator-container">
+                                            <div class="typing-indicator">
+                                                <span></span>
+                                                <span></span>
+                                                <span></span>
+                                            </div>
+                                        </div>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="MH.MessageContentType.Media">
+                                        <div [ngSwitch]="msg.messageData.content.media.type">
+                                            <ng-container *ngSwitchCase="MH.MediaType.IMAGE">
+                                                <img [src]="msg.messageData.content.media.url" class="chat-media" />
+                                                <span class="chat-bottom-overlay">
+                                                    {{msg.messageData.content.text||'Photo'}}
+                                                </span>
+                                            </ng-container>
+                                            <ng-container *ngSwitchCase="MH.MediaType.VIDEO">
+                                                <video controls="controls" class="chat-media">
+                                                    <source [src]="msg.messageData.content.media.url" />
+                                                </video>
+                                                <span class="chat-bottom-overlay">
+                                                    Video
+                                                </span>
+                                            </ng-container>
+                                            <ng-container *ngSwitchCase="MH.MediaType.AUDIO">
+                                                <div class="chat-media">
+                                                    <audio controls="controls">
+                                                        <source [src]="msg.messageData.content.media.url" />
+                                                    </audio>
+                                                </div>
+                                                <span class="chat-bottom-overlay">
+                                                    Audio
+                                                </span>
+                                            </ng-container>
+                                            <ng-container *ngSwitchCase="MH.MediaType.FILE">
+                                                <img src="assets/svg/attachment.svg" class="chat-media chat-file-attachment" />
+                                                <span class="chat-bottom-overlay">
+                                                    File: {{msg.messageData.content.text}}
+                                                </span>
+                                            </ng-container>
+                                        </div>
+                                    </ng-container>
+                                </div>
+                                <span class="chat-time" [hidden]="msg.getMessageContentType()==MH.MessageContentType.Typing">
+                                    <span *ngIf="msg.direction==MH.Direction.Outgoing && msg.status==MH.MessageStatus.SentTimeout"><a href="javascript:;" (click)="msg.executeRetry()" class="ana-link ana-btn-retry">Retry</a></span>
+                                    {{msg.time | date:'shortTime'}}
+                                    <i *ngIf="msg.direction==MH.Direction.Outgoing && msg.status==MH.MessageStatus.ReceivedAtServer" class="glyphicon glyphicon-ok ana-sent-tick"></i>
+                                </span>
+                                <span class="chat-stub"></span>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="MH.MessageType.CAROUSEL">
+                        <div class="carousel-wrapper">
+                            <div #carouselContainer class="carousel-container scrollbar" [ngClass]="msg.meta.id">
+                                <div *ngFor="let carItem of msg.messageData.content.items" class="carousel-item-container">
+                                    <div class="carousel-item">
+                                        <div class="carousel-item-content">
+                                            <div *ngIf="carItem.media">
+                                                <div [ngSwitch]="carItem.media.type" class="carousel-item-media">
+                                                    <ng-container *ngSwitchCase="MH.MediaType.IMAGE">
+                                                        <img [src]="carItem.media.url" />
+                                                    </ng-container>
+                                                    <ng-container *ngSwitchCase="MH.MediaType.VIDEO">
+                                                        <video controls [src]="carItem.media.url"></video>
+                                                    </ng-container>
+                                                    <ng-container *ngSwitchCase="MH.MediaType.AUDIO">
+                                                        <audio controls [src]="carItem.media.url"></audio>
+                                                    </ng-container>
+                                                </div>
+                                            </div>
+                                            <div class="carousel-item-title text-wrap">
+                                                {{carItem.title}}
+                                            </div>
+                                            <div class="carousel-item-desc text-wrap">
+                                                {{carItem.desc}}
+                                            </div>
+                                        </div>
+                                        <div class="carousel-item-button-container">
+                                            <div class="carousel-item-button" *ngFor="let carBtn of carItem.options">
+                                                <button md-button (click)="handleCarouselClick(msg, carBtn)" [disabled]="!isLastMessage(msg)">{{carBtn.title}}</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-arrow right" (click)="scrollCarousel(msg.meta.id, 'right')" [hidden]="!canScrollCarousel(msg.meta.id,'right')">
+                                <i class="glyphicon glyphicon-chevron-right"></i>
+                            </div>
+                            <div class="carousel-arrow left" (click)="scrollCarousel(msg.meta.id, 'left')" [hidden]="!canScrollCarousel(msg.meta.id,'left')">
+                                <i class="glyphicon glyphicon-chevron-left"></i>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-input-container" #inputContainer>
+            <div *ngIf="chatInput.clickInput">
+                <div [ngSwitch]="chatInput.clickInput.content.inputType">
+                    <ng-container *ngSwitchCase="MH.InputType.OPTIONS">
+                        <div class="chat-input-click-container">
+                            <div *ngFor="let option of chatInput.clickInput.content.options" class="chat-input click">
+                                <button type="button" class="btn-click" (click)="chatInput.handleBtnOptionClick(chatInput.clickInput, option.value)">{{option.title}}</button>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngSwitchDefault>
+                        <div class="chat-input-click-container">
+                            <div class="chat-input click">
+                                <button type="button" class="btn-click" (click)="chatInput.handleClick(chatInput.clickInput)">Choose {{MH.InputType[chatInput.clickInput.content.inputType].toLowerCase()}}</button>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+
+            <div class="chat-input text" *ngIf="chatInput.textInput">
+                <input [type]="chatInput.htmlInputType(chatInput.textInput)" [readonly]="chatInput.textInput.disabled" (keypress)="chatInput.handleKeyPress(chatInput.textInput, $event)" name="chat-text" id="chat-text" class="chat-text-input" [(ngModel)]="chatInput.textInput.content.input.val" [placeholder]="((chatInput.textInput.disabled? 'Waiting for response':(chatInput.textInput.content.textInputAttr?chatInput.textInput.content.textInputAttr.placeHolder:'')))" [maxlength]="(chatInput.textInput.content.textInputAttr?chatInput.textInput.content.textInputAttr.maxLength:'')" />
+                <button type="button" class="btn-icon" [disabled]="!chatInput.textInput.content.input.val" (click)="chatInput.handleClick(chatInput.textInput)"><i class="glyphicon glyphicon-send"></i></button>
+            </div>
+        </div>
+    </div>
+</div>

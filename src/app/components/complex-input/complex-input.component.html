@@ -1,0 +1,67 @@
+<h2 md-dialog-title>{{ComplexType[params.Type]}}</h2>
+
+<md-dialog-content>
+  <div [ngSwitch]="params.Type">
+    <ng-container *ngSwitchCase="ComplexType.Date">
+      <md-form-field>
+        <input mdInput [mdDatepicker]="datePicker" placeholder="Choose a date" [(ngModel)]="choosenDate">
+        <md-datepicker-toggle mdSuffix [for]="datePicker" class="ana-color-accent"></md-datepicker-toggle>
+        <md-datepicker touchUi="true" #datePicker></md-datepicker>
+      </md-form-field>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="ComplexType.Time">
+      <md-form-field>
+        <input mdInput type="time" placeholder="Choose a time" [(ngModel)]="choosenTime">
+      </md-form-field>
+    </ng-container>
+    <ng-container *ngSwitchCase="ComplexType.Address">
+
+      <md-form-field>
+        <input mdInput type="text" placeholder="Street Address" [(ngModel)]="givenAddress.line1" name="addressLine1">
+      </md-form-field>
+
+      <md-form-field>
+        <input mdInput type="text" placeholder="Area" [(ngModel)]="givenAddress.area" name="addressArea">
+      </md-form-field>
+
+      <md-form-field>
+        <input mdInput type="text" placeholder="City" [(ngModel)]="givenAddress.city" name="addressCity">
+      </md-form-field>
+
+      <md-form-field>
+        <input mdInput type="text" placeholder="State" [(ngModel)]="givenAddress.state" name="addressState">
+      </md-form-field>
+
+      <md-form-field>
+        <input mdInput type="text" placeholder="Country" [(ngModel)]="givenAddress.country" name="addressCountry">
+      </md-form-field>
+
+      <md-form-field>
+        <input mdInput type="text" placeholder="Pin" [(ngModel)]="givenAddress.pin" name="addressPin">
+      </md-form-field>
+    </ng-container>
+    <ng-container *ngSwitchCase="ComplexType.Location">
+      <agm-map [latitude]="geoLoc.lat" [longitude]="geoLoc.lng">
+        <agm-marker [latitude]="geoLoc.lat" [longitude]="geoLoc.lng" [markerDraggable]="true" (dragEnd)="mapLocationUpdated($event)"></agm-marker>
+      </agm-map>
+    </ng-container>
+    <ng-container *ngSwitchCase="ComplexType.List">
+      <md-list *ngIf="listMultiple">
+        <md-list-item *ngFor="let listItem of listValues; let i = index">
+          <md-checkbox [(ngModel)]="listItem.isSelected" name="listItemIsSelected-{{i}}" align="start">{{listItem.text}}</md-checkbox>
+        </md-list-item>
+      </md-list>
+      <md-list *ngIf="!listMultiple">
+        <md-radio-group [(ngModel)]="selectedListItem">
+          <md-list-item *ngFor="let listItem of listValues; let i = index">
+            <md-radio-button name="listItemIsSelected-{{i}}" [value]="listItem" align="start">{{listItem.text}}</md-radio-button>
+          </md-list-item>
+        </md-radio-group>
+      </md-list>
+    </ng-container>
+  </div>
+</md-dialog-content>
+<md-dialog-actions align="center">
+  <button md-raised-button color="primary" [disabled]="!isValid()" md-button class="complex-input-btn-done" (click)="dialogClose()">Done</button>
+</md-dialog-actions>
