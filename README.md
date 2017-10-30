@@ -5,9 +5,9 @@
 Use ANA Web Chat Plugin to deploy your ANA chat bot onto your website. 
 
   - Brand it as your website.
-    - [![Simba - ANA Web Chat](https://github.com/Kitsune-tools/ana-web-chat-plugin/blob/master/assets/webchat-pc-simba.png)](https://github.com/Kitsune-tools/ana-web-chat-plugin/blob/master/assets/webchat-pc-simba.png)
+    - [![Simba - ANA Web Chat](https://github.com/Kitsune-tools/ANAChat-Web/blob/master/assets/webchat-pc-simba.png)](https://github.com/Kitsune-tools/ANAChat-Web/blob/master/assets/webchat-pc-simba.png)
   - Mobile friendly out of the box. 
-    - <a href="http://ana.chat/ecommerce.html"><img alt="Mobile - ANA Web Chat" src="https://github.com/Kitsune-tools/ana-web-chat-plugin/blob/master/assets/webchat-mobile.jpg" height="300"/></a>
+    - <a href="http://ana.chat/ecommerce.html"><img alt="Mobile - ANA Web Chat" src="https://github.com/Kitsune-tools/ANAChat-Web/blob/master/assets/webchat-mobile.jpg" height="300"/></a>
   - A small code snippet to integrate it on any page. 
 
 ## Integration
@@ -18,7 +18,7 @@ Setup ANA Chat Server and note down the server URL. Instructions will be availab
 
 **Step 2:**
 
-Download `ana-web-chat-plugin.zip` from [releases](https://github.com/Kitsune-tools/ana-web-chat-plugin/releases), extract and host it on any normal http server. Note the server URL. Let's call it `web-plugin.ana-chat-server.com`
+Download `ana-web-chat-plugin.zip` from [releases](https://github.com/Kitsune-tools/ANAChat-Web/releases), extract and host it on any normal http server. Note the server URL. Let's call it `web-plugin.ana-chat-server.com`
    - If you want to host this at a path like `/web-plugin/` instead of the root of your server, you will also need to update `<base href="/">` inside `head` of `index.html` to `<base href="/web-plugin/">`. If you do it, ANA web chat plug-in server URL will now be `ana-chat-server.com/web-plugin/`
 
 **Step 3:**
