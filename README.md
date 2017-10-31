@@ -5,9 +5,7 @@
 Use ANA Web Chat Plugin to deploy your ANA chat bot onto your website. 
 
   - Brand it as your website.
-    - [![Simba - ANA Web Chat](https://github.com/Kitsune-tools/ANAChat-Web/blob/master/assets/webchat-pc-simba.png)](https://github.com/Kitsune-tools/ANAChat-Web/blob/master/assets/webchat-pc-simba.png)
   - Mobile friendly out of the box. 
-    - <a href="http://ana.chat/ecommerce.html"><img alt="Mobile - ANA Web Chat" src="https://github.com/Kitsune-tools/ANAChat-Web/blob/master/assets/webchat-mobile.jpg" height="300"/></a>
   - A small code snippet to integrate it on any page. 
 
 ## Integration
