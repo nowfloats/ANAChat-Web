@@ -12,7 +12,8 @@ Use ANA Web Chat Plugin to deploy your ANA chat bot onto your website.
 
 **Step 1:**
 
-Setup ANA Chat Server and note down the server URL. Instructions will be available soon on how to do it yourself. Assuming you already have one, let's call it `ana-chat-server.com`
+Setup [ANA Conversation Studio and ANA Chat Server](https://github.com/Kitsune-tools/ProjectANA) to design and publish an ANA chat bot.
+  - Assuming you have done that have an ANA Chat Server URL, let's call it `ana-chat-server.com`
 
 **Step 2:**
 
