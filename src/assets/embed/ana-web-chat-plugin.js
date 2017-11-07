@@ -57,6 +57,7 @@
       display: flex;
       flex-direction: column;
       position: relative;
+	  background-color: #F5F5F5;
     }
 
     .ana-full-screen {
@@ -223,7 +224,37 @@
 		display: block;
 		opacity: 0.6;
 	}
+    .powered-by-ana {
+		font-size: 11px;
+		text-align: center;
+		z-index: 20;
+		position: absolute;
+		bottom: -20px;
+		width: 100%;
+	}
 
+	.powered-by-ana > div {
+		display: inline;
+		background-color: #F5F5F5;
+		border-radius: 0 0 10px 10px;
+		padding: 6px 24px;
+		box-shadow: 0px 20px 40px 1px rgba(0,0,0,0.36)
+	}
+
+	.powered-by-ana .powered {
+		font-style: italic;
+	}
+
+	.powered-by-ana .by-ana {
+		color: gray;
+	}
+    .ana-link {
+		color: inherit;
+		text-decoration: none;
+	}
+    .ana-link:hover {
+		text-decoration: underline;
+	}
 /* Smartphones (portrait and landscape) ----------- */
 @media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
 	.ana-root{
@@ -248,7 +279,8 @@
 								<path fill="#fff" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
 							</svg>
 						</div>
-					</div> 
+					</div>
+					<div class="powered-by-ana"><div><a class="ana-link" href="http://ana.chat" target="_blank"><span class="powered">&#x26a1;</span> <span class="by-ana">by ANA</span></a></div></div>
 				</div>
 				<div class="ana-minmax-btn" id="ana-max-btn">
 					<div class="max-btn" >
