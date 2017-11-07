@@ -592,11 +592,11 @@ export class ChatInputVM {
 	inputErrorMsg(inputVM: ChatInputItemVM) {
 		switch (inputVM.content.inputType) {
 			case models.InputType.EMAIL:
-				return 'Please enter a valid email address';
+				return 'Please give a valid email address';
 			case models.InputType.NUMERIC:
-				return 'Please enter a valid number';
+				return 'Please give a valid number';
 			case models.InputType.PHONE:
-				return 'Please enter a valid phone number';
+				return 'Please give a valid phone number';
 			case models.InputType.TEXT:
 				{
 					let c = inputVM.textInputContent();

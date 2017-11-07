@@ -575,3 +575,8 @@ video.chat-media {
     color: inherit;
     text-decoration: underline;
 }
+
+.chat-bottom-overlay > img {
+    height: 12px;
+    width: 12px;
+}

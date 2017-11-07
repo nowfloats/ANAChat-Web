@@ -38,7 +38,7 @@
                                             <ng-container *ngSwitchCase="MH.MediaType.IMAGE">
                                                 <img [src]="msg.messageData.content.media.url" class="chat-media" />
                                                 <span class="chat-bottom-overlay">
-                                                    {{msg.messageData.content.text||'Photo'}}
+                                                    <img src="assets/svg/picture.svg"/> {{msg.messageData.content.text||'Photo'}}
                                                 </span>
                                             </ng-container>
                                             <ng-container *ngSwitchCase="MH.MediaType.VIDEO">
@@ -46,7 +46,7 @@
                                                     <source [src]="msg.messageData.content.media.url" />
                                                 </video>
                                                 <span class="chat-bottom-overlay">
-                                                    Video
+                                                    <img src="assets/svg/video-from-gallery.svg" /> {{msg.messageData.content.text||'Video'}}
                                                 </span>
                                             </ng-container>
                                             <ng-container *ngSwitchCase="MH.MediaType.AUDIO">
@@ -56,13 +56,13 @@
                                                     </audio>
                                                 </div>
                                                 <span class="chat-bottom-overlay">
-                                                    Audio
+                                                    <img src="assets/svg/record-voice.svg" /> {{msg.messageData.content.text||'Audio'}}
                                                 </span>
                                             </ng-container>
                                             <ng-container *ngSwitchCase="MH.MediaType.FILE">
                                                 <img src="assets/svg/attachment.svg" class="chat-media chat-file-attachment" />
                                                 <span class="chat-bottom-overlay">
-                                                    File: {{msg.messageData.content.text}}
+                                                    <img src="assets/svg/attachment-white.svg" /> {{msg.messageData.content.text||'File'}}
                                                 </span>
                                             </ng-container>
                                         </div>
