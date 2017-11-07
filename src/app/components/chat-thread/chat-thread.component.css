@@ -272,6 +272,7 @@ video.chat-media {
 
 .carousel-wrapper {
     position: relative;
+    margin: 0 -20px;
 }
 
     .carousel-wrapper > .carousel-arrow {
@@ -329,6 +330,7 @@ video.chat-media {
     height: 100%;
     display: flex;
     flex-direction: column;
+    box-shadow: 0px 1px 6px 1px rgba(110, 110, 110, 0.15);
 }
 
 .carousel-item-content {
@@ -338,6 +340,7 @@ video.chat-media {
 
 .carousel-item-container {
     margin-bottom: 5px;
+    padding: 3px; /*For carousel item shadow to be visible*/
 }
 
 .carousel-item-title {
@@ -553,15 +556,19 @@ video.chat-media {
 .scrollbar::-webkit-scrollbar-thumb {
     border-radius: 10px;
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-    background-color: #555;
+    background-color: rgba(0,0,0,.3);
 }
 
 .carousel-item-container:first-child > .carousel-item {
-    margin-left: 0;
+    margin-left: 16px;
 }
 
 .carousel-item-container:last-child > .carousel-item {
-    margin-right: 0;
+    margin-right: 16px;
+}
+
+.carousel-arrow > i {
+    color: rgba(0,0,0,.6);
 }
 
 .ana-link {

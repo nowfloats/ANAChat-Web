@@ -129,6 +129,10 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 		this.chatInput.resetInputs();
 	}
 
+	chatTextInputOnFocus() {
+		this.chatThread.scrollLastIntoView();
+	}
+
 	textInputFocus() {
 		let ele = this.inputContainerRef.nativeElement as HTMLDivElement;
 		if (ele) {

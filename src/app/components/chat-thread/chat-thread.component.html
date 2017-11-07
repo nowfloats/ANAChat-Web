@@ -144,7 +144,7 @@
             </div>
 
             <div class="chat-input text" *ngIf="chatInput.textInput">
-                <input [type]="chatInput.htmlInputType(chatInput.textInput)" [readonly]="chatInput.textInput.disabled" (keypress)="chatInput.handleKeyPress(chatInput.textInput, $event)" name="chat-text" id="chat-text" class="chat-text-input" [(ngModel)]="chatInput.textInput.content.input.val" [placeholder]="((chatInput.textInput.disabled? 'Waiting for response':(chatInput.textInput.content.textInputAttr?chatInput.textInput.content.textInputAttr.placeHolder:'')))" [maxlength]="(chatInput.textInput.content.textInputAttr?chatInput.textInput.content.textInputAttr.maxLength:'')" />
+                <input [type]="chatInput.htmlInputType(chatInput.textInput)" [readonly]="chatInput.textInput.disabled" (keypress)="chatInput.handleKeyPress(chatInput.textInput, $event)" name="chat-text" id="chat-text" class="chat-text-input" [(ngModel)]="chatInput.textInput.content.input.val" [placeholder]="((chatInput.textInput.disabled? 'Waiting for response':(chatInput.textInput.content.textInputAttr?chatInput.textInput.content.textInputAttr.placeHolder:'')))" [maxlength]="(chatInput.textInput.content.textInputAttr?chatInput.textInput.content.textInputAttr.maxLength:'')" (focus)="chatTextInputOnFocus()"/>
                 <button type="button" class="btn-icon" [disabled]="!chatInput.textInput.content.input.val" (click)="chatInput.handleClick(chatInput.textInput)"><i class="glyphicon glyphicon-send"></i></button>
             </div>
         </div>
