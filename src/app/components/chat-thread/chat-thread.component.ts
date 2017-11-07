@@ -130,7 +130,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 	}
 
 	chatTextInputOnFocus() {
-		this.chatThread.scrollLastIntoView();
+		this.chatThread.scrollLastIntoView(1000);
 	}
 
 	textInputFocus() {
