@@ -101,6 +101,7 @@ export class ChatThreadVM {
 	}
 
 	addTextReply(text: string, ackId: string) {
+		if (!text) return null;
 		let msg = new ChatMessageVM(new models.ANAChatMessage({
 			"meta": {
 				"timestamp": new Date().getTime(),
@@ -264,7 +265,6 @@ export class ChatInputVM {
 	textInput: ChatInputItemVM = undefined;
 	clickInput: ChatInputItemVM = undefined;
 
-	errorMsg: string;
 	inputCategory(inputVM: ChatInputItemVM): models.InputCategory {
 		switch (inputVM.content.inputType) {
 			case models.InputType.TEXT:
@@ -279,8 +279,24 @@ export class ChatInputVM {
 
 	handleClick(inputVM: ChatInputItemVM) {
 		if (!this.isInputValid(inputVM)) {
-			this.errorMsg = this.inputErrorMsg(inputVM);
-			alert(this.inputErrorMsg(inputVM));
+			let errorMsg = this.inputErrorMsg(inputVM);
+			let lastMsg = this.chatThread.messages[this.chatThread.messages.length - 1];
+			if (lastMsg.direction == Direction.Incoming && lastMsg.messageAckId == "ERROR_MSG" && lastMsg.simpleMessageData().content.text == errorMsg)
+				return; //Skip if already error message is added with the same msg text.
+
+			//alert(this.inputErrorMsg(inputVM));
+			switch (inputVM.content.inputType) {
+				case models.InputType.TEXT:
+				case models.InputType.EMAIL:
+				case models.InputType.PHONE:
+				case models.InputType.NUMERIC:
+					{
+						let modifieldInputContent = inputVM.content as models.TextInputContent;
+						this.chatThread.addTextReply(modifieldInputContent.input.val, "");
+						break;
+					}
+			}
+			this.chatThread.addTextIncoming(errorMsg, "ERROR_MSG");
 			return;
 		}
 		this.resetInputs();
@@ -476,7 +492,11 @@ export class ChatInputVM {
 
 	handleKeyPress(inputVM: ChatInputItemVM, event: KeyboardEvent) {
 		if (event.keyCode == 13) //Enter key
-			this.handleClick(inputVM);
+			if (this.inputCategory(inputVM) == models.InputCategory.Text) {
+				if (inputVM.textInputContent().input.val)
+					this.handleClick(inputVM);
+			} else
+				this.handleClick(inputVM);
 	}
 	handleBtnOptionClick(inputVM: ChatInputItemVM, optionVal: string) {
 		if (inputVM.content.inputType == models.InputType.OPTIONS) {
@@ -562,7 +582,7 @@ export class ChatInputVM {
 			case models.InputType.OPTIONS:
 				{
 					let x = inputVM.content as models.OptionsInputContent;
-					return x.input.val
+					return x.input.val;
 				}
 			default:
 				console.log(`Unsupported button type: ${inputVM.content.inputType}`);
