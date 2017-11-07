@@ -261,11 +261,66 @@
 		position: fixed;
 		bottom: 0;
 		right: 0;
-		top: 0;
 		border: 0;		
 		height: 100%;
 		width: 100vw;
 	}
+    .powered-by-ana {
+		display: none;
+	}
+	@-webkit-keyframes maximizeAnimation {
+      0% {
+          opacity: 0;
+		  width: 0px;
+          height: 0px;
+      }
+      100% {
+          opacity: 1;
+          width: 100vw;
+          height: 100%;
+      }
+    }
+         
+    @keyframes maximizeAnimation {
+      0% {
+          opacity: 0;
+		  width: 0px;
+          height: 0px;
+      }
+      100% {
+          opacity: 1;
+		  width: 100vw;
+          height: 100%;
+      }
+    }
+
+	@-webkit-keyframes minimizeAnimation {
+      0% {
+          opacity: 1;
+          width: 100vw;
+          height: 100%;
+      }
+      100% {
+          opacity: 0;
+          display: none;
+          width: 0px;
+          height: 0px;
+      }
+    }
+         
+    @keyframes minimizeAnimation {
+      0% {
+          opacity: 1;
+          width: 100vw;
+          height: 100%;
+      }
+      100% {
+          opacity: 0;
+          display: block;
+          width: 0px;
+          height: 0px;
+      }
+    }
 }
 `;
 			let htmlIntoBody = `
