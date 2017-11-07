@@ -394,9 +394,11 @@ video.chat-media {
 }
 
     .ana-logo > img {
-        width: 42px;
-        height: 42px;
-        border-radius: 0 5px 5px 5px;
+        width: 35px;
+        height: 35px;
+        border-radius: 0 7px 7px 7px;
+        box-shadow: 0px 0px 25px 3px rgba(0,0,0,0.19);
+        margin-top: 4px;
     }
 
 .ana-content {
