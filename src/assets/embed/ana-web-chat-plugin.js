@@ -286,10 +286,10 @@
 
 	.powered-by-ana > div {
 		display: inline;
-		background-color: #F5F5F5;
+		/*background-color: #F5F5F5;*/
 		border-radius: 0 0 10px 10px;
 		padding: 6px 24px;
-		box-shadow: 0px 20px 40px 1px rgba(0,0,0,0.36)
+		/*box-shadow: 0px 20px 40px 1px rgba(0,0,0,0.36)*/
 	}
 
 	.powered-by-ana .powered {
