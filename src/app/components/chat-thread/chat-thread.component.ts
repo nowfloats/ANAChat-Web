@@ -144,6 +144,49 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 		}
 	}
 
+	historyPage: number = -1;
+	loadHistory(next: () => void) {
+		this.apiService.fetchHistory(this.historyPage + 1).subscribe(resp => {
+			this.historyPage = resp.number;
+			let chatMsgs = resp.content.map(x => new models.ANAChatMessage(x));
+			chatMsgs.forEach(chatMsg => {
+				let direction = chatMsg.meta.recipient.id == this.stompService.config.businessId ? vm.Direction.Outgoing : vm.Direction.Incoming;
+				switch (chatMsg.data.type) {
+					case models.MessageType.CAROUSEL:
+					case models.MessageType.SIMPLE:
+						this.chatThread.messages.unshift(new vm.ChatMessageVM(chatMsg, direction, ""));
+						break;
+					case models.MessageType.INPUT:
+						if (direction == vm.Direction.Outgoing) { //Ignore incoming input messages as their outgoing messages will be present (along with user given data).
+							this.chatInput.addThreadMessageForInput(new vm.ChatInputItemVM(chatMsg));
+						}
+						break;
+					default:
+						break;
+				}
+			});
+			this.chatThread.messages.sort((x, y) => x.meta.timestamp - y.meta.timestamp);
+
+			let inputChatMsgs = chatMsgs.filter(x => x.data.type == models.MessageType.INPUT).sort((x, y) => x.meta.timestamp - y.meta.timestamp);
+			if (inputChatMsgs) {
+				let latestChatInput = inputChatMsgs[inputChatMsgs.length - 1];
+				if (latestChatInput) {
+					this.chatInput.setInput(new vm.ChatInputItemVM(latestChatInput));
+					this.textInputFocus();
+				}
+			}
+
+			if (next)
+				next();
+		}, err => {
+			console.log("Chat History Load Error:");
+			console.log(err);
+
+			if (next)
+				next();
+		});
+	}
+
 	MH = new vm.ModelHelpers();
 	ngOnInit() {
 		this.settings = UtilitiesService.settings;
@@ -224,8 +267,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 					meta: UtilitiesService.getReplyMeta(firstMsg.meta),
 					data: firstMsg.data
 				}), msg);
-			}
-			else {
+			} else {
 				//Retrying all pending messages in the chat thread.
 				let pendingMsgs = this.chatThread.messages.filter(x => x.status == vm.MessageStatus.SentTimeout || x.status == vm.MessageStatus.SentToServer && x.retrySending);
 				pendingMsgs.forEach(x => x.retrySending());
@@ -238,5 +280,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 				msg.clearTimeoutTimer();
 			}
 		};
+
+		this.loadHistory(() => this.stompService.connect());
 	}
 }

@@ -36,10 +36,12 @@ export class AppComponent {
 		}
 		if (settings.thirdPartyConfig && UtilitiesService.googleMapsConfigRef)
 			UtilitiesService.googleMapsConfigRef.apiKey = settings.thirdPartyConfig.googleMapsKey;
-		if (settings.appConfig)
+		if (settings.appConfig) {
 			this.apiService.fileUploadEndpoint = settings.appConfig.fileUploadEndpoint;
+			this.apiService.setAPIEndpoint(settings.appConfig.apiEndpoint);
+		}
 		if (settings.stompConfig)
-			this.stomp.connect(settings.stompConfig);
+			this.stomp.configure(settings.stompConfig);
 	}
 
 	getCustomStyle(accent: string = undefined, secondary: string = undefined, accentFG: string = undefined, contentWidth: string = undefined) {

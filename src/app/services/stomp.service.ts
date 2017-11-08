@@ -50,7 +50,7 @@ export class StompService {
 			console.log.apply(console, args);
 	}
 
-	private configure(config?: StompConfig) {
+	configure(config?: StompConfig) {
 		if (config === null && this.config === null)
 			throw Error('No configuration provided!');
 

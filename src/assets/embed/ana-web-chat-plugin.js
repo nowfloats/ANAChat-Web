@@ -3,12 +3,62 @@
 		uuidv4: () => {
 			return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).toString().replace(/[018]/g, function (c) { return (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16); });
 		},
+		parseURL: (url) => {
+			var a = document.createElement('a');
+			a.href = url;
+			return {
+				source: url,
+				protocol: a.protocol.replace(':', ''),
+				host: a.hostname,
+				port: a.port,
+				query: a.search,
+			};
+		},
+		setCookie: (name, value, days = 7, path = '/') => {
+			const expires = new Date(Date.now() + days * 864e5).toUTCString()
+			document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=' + path
+		},
+		getCookie: (name) => {
+			return document.cookie.split('; ').reduce((r, v) => {
+				const parts = v.split('=')
+				return parts[0] === name ? decodeURIComponent(parts[1]) : r
+			}, '')
+		},
+		deleteCookie: (name, path) => {
+			setCookie(name, '', -1, path)
+		},
 		main: () => {
 			let script = document.getElementById("ana-web-chat-script");
+			let stompEndpoint = script.getAttribute("data-endpoint");
+			let businessId = script.getAttribute("data-businessid");
+			let apiEndpoint = script.getAttribute("data-api-endpoint");
+			let fileUploadUrl = "";
+
+			if (!apiEndpoint) {
+				fileUploadUrl = script.getAttribute("data-file-upload-url");
+				if (fileUploadUrl) {
+					let _url = base.parseURL(fileUploadUrl);
+					apiEndpoint = _url.protocol + "://" + _url.host;
+					if (apiEndpoint.charAt(apiEndpoint.length - 1) != '/')
+						apiEndpoint += "/";
+				}
+			} else {
+				if (apiEndpoint.charAt(apiEndpoint.length - 1) != '/')
+					apiEndpoint += "/";
+
+				fileUploadUrl = apiEndpoint + "files";
+			}
+			let customerIdCookieName = 'ana-customerid-for-' + businessId;
+			let customerId = base.getCookie(customerIdCookieName); //Get customer id for this business
+			if (!customerId) {
+				customerId = base.uuidv4(); //new customer id
+				base.setCookie(customerIdCookieName, customerId);
+			}
+
 			let stompConfig = {
-				endpoint: script.getAttribute("data-endpoint"),
-				customerId: base.uuidv4(),
-				businessId: script.getAttribute("data-businessid"),
+				endpoint: stompEndpoint,
+				customerId: customerId,
+				businessId: businessId,
 				debug: script.getAttribute("data-debug") || false
 			};
 			let brandingConfig = {
@@ -23,7 +73,8 @@
 				frameContentWidth: script.getAttribute("data-frame-content-width") || '360px'
 			};
 			let appConfig = {
-				fileUploadEndpoint: script.getAttribute("data-file-upload-url")
+				fileUploadEndpoint: fileUploadUrl,
+				apiEndpoint: apiEndpoint
 			};
 			let thirdPartyConfig = {
 				googleMapsKey: script.getAttribute("data-gmaps-key")

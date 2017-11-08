@@ -55,7 +55,7 @@ export class UtilitiesService {
 
     static googleMapsStaticLink(latLng: GeoLoc) {
         return `https://maps.googleapis.com/maps/api/staticmap?center=${latLng.lat},${latLng.lng}&zoom=13&size=300x150&maptype=roadmap&markers=color:red|label:A|${latLng.lat},${latLng.lng}&key=${UtilitiesService.googleMapsConfigRef.apiKey}`;
-    }
+	}
 
 }
 

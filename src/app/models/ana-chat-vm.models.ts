@@ -100,11 +100,11 @@ export class ChatThreadVM {
 		return msg;
 	}
 
-	addTextReply(text: string, ackId: string) {
+	addTextReply(text: string, ackId: string, timestamp?: number) {
 		if (!text) return null;
 		let msg = new ChatMessageVM(new models.ANAChatMessage({
 			"meta": {
-				"timestamp": new Date().getTime(),
+				"timestamp": timestamp || new Date().getTime(),
 			},
 			"data": {
 				"type": models.MessageType.SIMPLE,
@@ -146,10 +146,10 @@ export class ChatThreadVM {
 		}
 	}
 
-	addMediaReply(media: models.SimpleMedia, text: string = '', ackId: string) {
+	addMediaReply(media: models.SimpleMedia, text: string = '', ackId: string, timestamp?: number) {
 		let msg = new ChatMessageVM(new models.ANAChatMessage({
 			"meta": {
-				"timestamp": new Date().getTime(),
+				"timestamp": timestamp || new Date().getTime(),
 			},
 			"data": {
 				"type": models.MessageType.SIMPLE,
@@ -190,7 +190,8 @@ export class ChatInputItemVM {
 	constructor(message: models.ANAChatMessage) {
 		this.data = message.data;
 		this.content = message.inputData().content;
-		this.content.input = {};
+		if (!this.content.input)
+			this.content.input = {};
 		this.meta = message.meta;
 		this.disabled = false;
 	}
@@ -201,6 +202,82 @@ export class ChatInputVM {
 		public chatThread: ChatThreadVM,
 		public stompService: StompService,
 		public apiService: APIService) { }
+
+	addThreadMessageForInput(inputVM: ChatInputItemVM) {
+		let ackId = "";
+		let timestamp = inputVM.meta.timestamp;
+		switch (inputVM.content.inputType) {
+			case models.InputType.TEXT:
+			case models.InputType.EMAIL:
+			case models.InputType.PHONE:
+			case models.InputType.NUMERIC:
+				{
+					let modifieldInputContent = inputVM.content as models.TextInputContent;
+					return this.chatThread.addTextReply(modifieldInputContent.input.val, ackId, timestamp);
+				}
+			case models.InputType.ADDRESS:
+				{
+					let modifieldInputContent = inputVM.content as models.AddressInputContent;
+					let userAddressInput = modifieldInputContent.input;
+					return this.chatThread.addTextReply(`${[userAddressInput.line1, userAddressInput.area, userAddressInput.city, userAddressInput.state, userAddressInput.country, userAddressInput.pin].filter(x => x).join(", ")}`, ackId, timestamp);
+				}
+			case models.InputType.LOCATION:
+				{
+					let locInputData = inputVM.content as models.LocationInputContent;
+					let gMapUrl = UtilitiesService.googleMapsStaticLink(locInputData.input.location);
+					return this.chatThread.addMediaReply({
+						previewUrl: gMapUrl,
+						type: models.MediaType.IMAGE,
+						url: gMapUrl
+					}, "Location", ackId, timestamp);
+				}
+			case models.InputType.MEDIA:
+				{
+					let mediaInputContent = inputVM.content as models.MediaInputContent;
+					if (mediaInputContent && mediaInputContent.input.media) {
+						let asset = mediaInputContent.input.media[0];
+						let media: models.SimpleMedia = {
+							previewUrl: asset.previewUrl,
+							type: asset.type,
+							url: asset.url
+						};
+						return this.chatThread.addMediaReply(media, '', ackId, timestamp);
+					}
+					return null;
+				}
+			case models.InputType.LIST:
+				{
+					let listInputContent = inputVM.content as models.ListInputContent;
+					let selectedValues = listInputContent.input.val.split(',');
+					let selectedListItems = listInputContent.values.filter(x => selectedValues.indexOf(x.value) != -1);
+
+					return this.chatThread.addTextReply(selectedListItems.map(x => x.text).join(', '), ackId, timestamp);
+				}
+			case models.InputType.TIME:
+				{
+					let timeContent = inputVM.content as models.TimeInputContent;
+					let displayTime = UtilitiesService.anaTimeDisplay(timeContent.input.time);
+					return this.chatThread.addTextReply(displayTime, ackId, timestamp);
+				}
+			case models.InputType.DATE:
+				{
+					let dateContent = inputVM.content as models.DateInputContent;
+					let displayDate = UtilitiesService.anaDateDisplay(dateContent.input.date);
+					return this.chatThread.addTextReply(displayDate, ackId, timestamp);
+				}
+			case models.InputType.OPTIONS:
+				{
+					let optionInputContent = inputVM.content as models.OptionsInputContent;
+					let selectedOption = optionInputContent.options.find(x => x.value == optionInputContent.input.val);
+					if (selectedOption)
+						return this.chatThread.addTextReply(selectedOption.title, ackId, timestamp);
+					return null;
+				}
+			default:
+				console.log(`Unsupported button type: ${inputVM.content.inputType}`);
+				break;
+		}
+	}
 
 	setInput(chatInputItemVM: ChatInputItemVM) {
 		if (this.textInput)
