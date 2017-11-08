@@ -129,6 +129,34 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 		this.chatInput.resetInputs();
 	}
 
+	addThreadMessageForCarouselInput(chatMessage: vm.ChatMessageVM) {
+		try {
+			let carMsg = chatMessage.carouselMessageData();
+			let msg: vm.ChatMessageVM = null;
+			carMsg.content.items.forEach(x => {
+				try {
+					x.options.forEach(y => {
+						try {
+							let value = "";
+							if (y.type == models.ButtonType.URL) {
+								let v = JSON.parse(y.value);
+								value = v.value;
+							} else
+								value = y.value;
+
+							if (value == carMsg.content.input.val)
+								msg = this.chatThread.addTextReply(y.title, "", chatMessage.meta.timestamp);
+						} catch (e) { console.log(e); }
+					});
+				} catch (e) { console.log(e); }
+			});
+			return msg;
+		} catch (e) {
+			console.log(e);
+			return null;
+		}
+	}
+
 	chatTextInputOnFocus() {
 		this.chatThread.scrollLastIntoView(1000);
 	}
@@ -153,6 +181,11 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 				let direction = chatMsg.meta.recipient.id == this.stompService.config.businessId ? vm.Direction.Outgoing : vm.Direction.Incoming;
 				switch (chatMsg.data.type) {
 					case models.MessageType.CAROUSEL:
+						if (direction == vm.Direction.Incoming)
+							this.chatThread.messages.unshift(new vm.ChatMessageVM(chatMsg, direction, ""));
+						else if (direction == vm.Direction.Outgoing)
+							this.addThreadMessageForCarouselInput(new vm.ChatMessageVM(chatMsg, direction, ""));
+						break;
 					case models.MessageType.SIMPLE:
 						this.chatThread.messages.unshift(new vm.ChatMessageVM(chatMsg, direction, ""));
 						break;
