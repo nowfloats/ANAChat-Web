@@ -11,9 +11,8 @@
             <div class="ana-actions" style="display: none">
                 <a class="ana-minmax-btn" href="javascript:;" (click)="setMin(!isMin)"></a>
             </div>
-
             <div class="chat-history-loading" [hidden]="!fetchingHistory">
-                <mat-progress-spinner color="primary" mode="indeterminate"></mat-progress-spinner>
+                <md-progress-bar mode="indeterminate" color="primary"></md-progress-bar>
             </div>
         </div>
         <div class="chat-thread scrollbar" #chatThreadView (scroll)="chatThreadOnScroll($event)">

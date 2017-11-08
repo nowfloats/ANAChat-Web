@@ -100,7 +100,7 @@ export class ChatThreadVM {
 		return msg;
 	}
 
-	addTextReply(text: string, ackId: string, timestamp?: number, pushOnly: boolean = false) {
+	addTextReply(text: string, ackId: string, timestamp?: number, insert: boolean = false) {
 		if (!text) return null;
 		let msg = new ChatMessageVM(new models.ANAChatMessage({
 			"meta": {
@@ -113,7 +113,7 @@ export class ChatThreadVM {
 				}
 			}
 		}), Direction.Outgoing, ackId);
-		this.addMessage(msg, pushOnly);
+		this.addMessage(msg, insert);
 		return msg;
 	}
 	typingTimerId: NodeJS.Timer;
@@ -145,7 +145,7 @@ export class ChatThreadVM {
 		}
 	}
 
-	addMediaReply(media: models.SimpleMedia, text: string = '', ackId: string, timestamp?: number, pushOnly: boolean = false) {
+	addMediaReply(media: models.SimpleMedia, text: string = '', ackId: string, timestamp?: number, insert: boolean = false) {
 		let msg = new ChatMessageVM(new models.ANAChatMessage({
 			"meta": {
 				"timestamp": timestamp || new Date().getTime(),
@@ -158,18 +158,23 @@ export class ChatThreadVM {
 				}
 			}
 		}), Direction.Outgoing, ackId);
-		this.addMessage(msg, pushOnly);
+		this.addMessage(msg, insert);
 		return msg;
 	}
 
-	addMessage(chatMsgVM: ChatMessageVM, pushOnly: boolean = false) {
-		if (!pushOnly)
+	addMessage(chatMsgVM: ChatMessageVM, insert: boolean = false) {
+		if (!insert)
 			this.removeTyping();
-		if (!chatMsgVM.meta.id || this.messages.findIndex(x => x.meta.id == chatMsgVM.meta.id) == -1) //Not allowing duplicate messages, if meta.id is set
-			this.messages.push(chatMsgVM);
+		if (!chatMsgVM.meta.id || this.messages.findIndex(x => x.meta.id == chatMsgVM.meta.id) == -1) {//Not allowing duplicate messages, if meta.id is set
+			if (insert)
+				this.messages.unshift(chatMsgVM);
+			else
+				this.messages.push(chatMsgVM);
+		}
+
 		//Sorting the messages based on timestamp. Currently disabled.
 		//this.messages.sort((x, y) => x.meta.timestamp - y.meta.timestamp);
-		if (!pushOnly)
+		if (!insert)
 			this.scrollLastIntoView();
 	}
 
@@ -209,7 +214,7 @@ export class ChatInputVM {
 		public stompService: StompService,
 		public apiService: APIService) { }
 
-	addThreadMessageForInput(inputVM: ChatInputItemVM) {
+	insertThreadMessageForInput(inputVM: ChatInputItemVM) {
 		let ackId = "";
 		let timestamp = inputVM.meta.timestamp;
 		switch (inputVM.content.inputType) {

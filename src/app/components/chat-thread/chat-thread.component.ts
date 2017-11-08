@@ -129,7 +129,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 		this.chatInput.resetInputs();
 	}
 
-	addThreadMessageForCarouselInput(chatMessage: vm.ChatMessageVM) {
+	insertThreadMessageForCarouselInput(chatMessage: vm.ChatMessageVM) {
 		try {
 			let carMsg = chatMessage.carouselMessageData();
 			let msg: vm.ChatMessageVM = null;
@@ -164,7 +164,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 			return;
 		}
 		if (this.chatThread.chatThreadView) {
-			if (this.chatThread.chatThreadView.scrollTop <= 10) {
+			if (this.chatThread.chatThreadView.scrollTop <= 2) {
 				this.fetchingHistory = true;
 				this.loadHistory(() => this.fetchingHistory = false);
 			}
@@ -186,20 +186,20 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 		}
 	}
 
-	historyPage: number = -1;
 	loadHistory(next: () => void) {
-		this.apiService.fetchHistory(this.historyPage + 1).subscribe(resp => {
+		let oldMsgTimestamp = ((this.chatThread.messages && this.chatThread.messages.length > 0) ? this.chatThread.messages[0].meta.timestamp : null);
+		this.apiService.fetchHistory(oldMsgTimestamp).subscribe(resp => {
 			try {
-				this.historyPage = resp.number;
 				let chatMsgs = resp.content.map(x => new models.ANAChatMessage(x));
-				chatMsgs.forEach(chatMsg => {
+				for (var i = 0; i < chatMsgs.length; i++) {
+					let chatMsg = chatMsgs[i];
 					let direction = chatMsg.meta.recipient.id == this.stompService.config.businessId ? vm.Direction.Outgoing : vm.Direction.Incoming;
 					switch (chatMsg.data.type) {
 						case models.MessageType.CAROUSEL:
 							if (direction == vm.Direction.Incoming)
 								this.chatThread.addMessage(new vm.ChatMessageVM(chatMsg, direction, ""), true);
 							else if (direction == vm.Direction.Outgoing)
-								this.addThreadMessageForCarouselInput(new vm.ChatMessageVM(chatMsg, direction, ""));
+								this.insertThreadMessageForCarouselInput(new vm.ChatMessageVM(chatMsg, direction, ""));
 							break;
 						case models.MessageType.SIMPLE:
 							if (direction == vm.Direction.Incoming) //Outgoing messages are never 'SIMPLE',  they are mostly 'INPUT' and rarely 'CAROUSEL'
@@ -207,16 +207,17 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 							break;
 						case models.MessageType.INPUT:
 							if (direction == vm.Direction.Outgoing) { //Ignore incoming input messages as their outgoing messages will be present (along with user given data).
-								this.chatInput.addThreadMessageForInput(new vm.ChatInputItemVM(chatMsg));
+								this.chatInput.insertThreadMessageForInput(new vm.ChatInputItemVM(chatMsg));
 							}
 							break;
 						default:
 							break;
 					}
-				});
-				this.chatThread.messages.sort((x, y) => x.meta.timestamp - y.meta.timestamp);
+				}
 
-				if (this.historyPage == 0) { //Display input and scroll to last only for page 0 of the history (latest page)
+				//this.chatThread.messages.sort((x, y) => x.meta.timestamp - y.meta.timestamp);
+
+				if (!oldMsgTimestamp) { //Display input and scroll to last only for page 0 of the history (latest page)
 					let inputChatMsgs = chatMsgs.filter(x => x.data.type == models.MessageType.INPUT).sort((x, y) => x.meta.timestamp - y.meta.timestamp);
 					if (inputChatMsgs) {
 						let latestChatInput = inputChatMsgs[inputChatMsgs.length - 1];
