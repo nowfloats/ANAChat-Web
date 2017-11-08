@@ -100,7 +100,7 @@ export class ChatThreadVM {
 		return msg;
 	}
 
-	addTextReply(text: string, ackId: string, timestamp?: number) {
+	addTextReply(text: string, ackId: string, timestamp?: number, pushOnly: boolean = false) {
 		if (!text) return null;
 		let msg = new ChatMessageVM(new models.ANAChatMessage({
 			"meta": {
@@ -113,8 +113,7 @@ export class ChatThreadVM {
 				}
 			}
 		}), Direction.Outgoing, ackId);
-
-		this.addMessage(msg);
+		this.addMessage(msg, pushOnly);
 		return msg;
 	}
 	typingTimerId: NodeJS.Timer;
@@ -146,7 +145,7 @@ export class ChatThreadVM {
 		}
 	}
 
-	addMediaReply(media: models.SimpleMedia, text: string = '', ackId: string, timestamp?: number) {
+	addMediaReply(media: models.SimpleMedia, text: string = '', ackId: string, timestamp?: number, pushOnly: boolean = false) {
 		let msg = new ChatMessageVM(new models.ANAChatMessage({
 			"meta": {
 				"timestamp": timestamp || new Date().getTime(),
@@ -159,22 +158,29 @@ export class ChatThreadVM {
 				}
 			}
 		}), Direction.Outgoing, ackId);
-
-		this.addMessage(msg);
+		this.addMessage(msg, pushOnly);
 		return msg;
 	}
 
-	addMessage(chatMsgVM: ChatMessageVM) {
-		this.removeTyping();
-		this.messages.push(chatMsgVM);
+	addMessage(chatMsgVM: ChatMessageVM, pushOnly: boolean = false) {
+		if (!pushOnly)
+			this.removeTyping();
+		if (!chatMsgVM.meta.id || this.messages.findIndex(x => x.meta.id == chatMsgVM.meta.id) == -1) //Not allowing duplicate messages, if meta.id is set
+			this.messages.push(chatMsgVM);
 		//Sorting the messages based on timestamp. Currently disabled.
 		//this.messages.sort((x, y) => x.meta.timestamp - y.meta.timestamp);
-		this.scrollLastIntoView();
+		if (!pushOnly)
+			this.scrollLastIntoView();
 	}
 
 	scrollLastIntoView(t: number = 100) {
 		if (this.chatThreadView)
 			setTimeout(() => this.chatThreadView.children.item(this.chatThreadView.children.length - 1).scrollIntoView({ behavior: 'smooth' }), t);
+	}
+
+	scrollToLast() {
+		if (this.chatThreadView)
+			window.requestAnimationFrame(() => this.chatThreadView.scrollTo({ top: this.chatThreadView.scrollHeight, behavior: 'smooth' }));
 	}
 }
 
@@ -213,13 +219,13 @@ export class ChatInputVM {
 			case models.InputType.NUMERIC:
 				{
 					let modifieldInputContent = inputVM.content as models.TextInputContent;
-					return this.chatThread.addTextReply(modifieldInputContent.input.val, ackId, timestamp);
+					return this.chatThread.addTextReply(modifieldInputContent.input.val, ackId, timestamp, true);
 				}
 			case models.InputType.ADDRESS:
 				{
 					let modifieldInputContent = inputVM.content as models.AddressInputContent;
 					let userAddressInput = modifieldInputContent.input;
-					return this.chatThread.addTextReply(`${[userAddressInput.line1, userAddressInput.area, userAddressInput.city, userAddressInput.state, userAddressInput.country, userAddressInput.pin].filter(x => x).join(", ")}`, ackId, timestamp);
+					return this.chatThread.addTextReply(`${[userAddressInput.line1, userAddressInput.area, userAddressInput.city, userAddressInput.state, userAddressInput.country, userAddressInput.pin].filter(x => x).join(", ")}`, ackId, timestamp, true);
 				}
 			case models.InputType.LOCATION:
 				{
@@ -229,7 +235,7 @@ export class ChatInputVM {
 						previewUrl: gMapUrl,
 						type: models.MediaType.IMAGE,
 						url: gMapUrl
-					}, "Location", ackId, timestamp);
+					}, "Location", ackId, timestamp, true);
 				}
 			case models.InputType.MEDIA:
 				{
@@ -241,7 +247,7 @@ export class ChatInputVM {
 							type: asset.type,
 							url: asset.url
 						};
-						return this.chatThread.addMediaReply(media, '', ackId, timestamp);
+						return this.chatThread.addMediaReply(media, '', ackId, timestamp, true);
 					}
 					return null;
 				}
@@ -251,26 +257,26 @@ export class ChatInputVM {
 					let selectedValues = listInputContent.input.val.split(',');
 					let selectedListItems = listInputContent.values.filter(x => selectedValues.indexOf(x.value) != -1);
 
-					return this.chatThread.addTextReply(selectedListItems.map(x => x.text).join(', '), ackId, timestamp);
+					return this.chatThread.addTextReply(selectedListItems.map(x => x.text).join(', '), ackId, timestamp, true);
 				}
 			case models.InputType.TIME:
 				{
 					let timeContent = inputVM.content as models.TimeInputContent;
 					let displayTime = UtilitiesService.anaTimeDisplay(timeContent.input.time);
-					return this.chatThread.addTextReply(displayTime, ackId, timestamp);
+					return this.chatThread.addTextReply(displayTime, ackId, timestamp, true);
 				}
 			case models.InputType.DATE:
 				{
 					let dateContent = inputVM.content as models.DateInputContent;
 					let displayDate = UtilitiesService.anaDateDisplay(dateContent.input.date);
-					return this.chatThread.addTextReply(displayDate, ackId, timestamp);
+					return this.chatThread.addTextReply(displayDate, ackId, timestamp, true);
 				}
 			case models.InputType.OPTIONS:
 				{
 					let optionInputContent = inputVM.content as models.OptionsInputContent;
 					let selectedOption = optionInputContent.options.find(x => x.value == optionInputContent.input.val);
 					if (selectedOption)
-						return this.chatThread.addTextReply(selectedOption.title, ackId, timestamp);
+						return this.chatThread.addTextReply(selectedOption.title, ackId, timestamp, true);
 					return null;
 				}
 			default:

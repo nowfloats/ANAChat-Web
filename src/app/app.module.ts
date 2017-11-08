@@ -14,7 +14,8 @@ import {
     MdListModule,
     MdCheckboxModule,
     MdCardModule,
-    MdRadioModule
+	MdRadioModule,
+	MdProgressSpinnerModule
 } from '@angular/material';
 
 import { AgmCoreModule, LAZY_MAPS_API_CONFIG } from '@agm/core';
@@ -48,7 +49,8 @@ import { ChainDelayService } from './services/chain-delay.service';
         MdListModule,
         MdCheckboxModule,
         MdCardModule,
-        MdRadioModule,
+		MdRadioModule,
+		MdProgressSpinnerModule,
         RouterModule.forRoot([
             { path: '', component: ChatThreadComponent },
             { path: '**', redirectTo: '' }

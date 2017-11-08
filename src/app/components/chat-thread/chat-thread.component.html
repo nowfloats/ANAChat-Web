@@ -11,8 +11,12 @@
             <div class="ana-actions" style="display: none">
                 <a class="ana-minmax-btn" href="javascript:;" (click)="setMin(!isMin)"></a>
             </div>
+
+            <div class="chat-history-loading" [hidden]="!fetchingHistory">
+                <mat-progress-spinner color="primary" mode="indeterminate"></mat-progress-spinner>
+            </div>
         </div>
-        <div class="chat-thread scrollbar" #chatThreadView>
+        <div class="chat-thread scrollbar" #chatThreadView (scroll)="chatThreadOnScroll($event)">
             <div class="chat-message" *ngFor="let msg of chatThread.messages">
                 <div [ngSwitch]="msg.messageData.type">
                     <ng-container *ngSwitchCase="MH.MessageType.SIMPLE">

@@ -145,7 +145,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 								value = y.value;
 
 							if (value == carMsg.content.input.val)
-								msg = this.chatThread.addTextReply(y.title, "", chatMessage.meta.timestamp);
+								msg = this.chatThread.addTextReply(y.title, "", chatMessage.meta.timestamp, true);
 						} catch (e) { console.log(e); }
 					});
 				} catch (e) { console.log(e); }
@@ -154,6 +154,20 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 		} catch (e) {
 			console.log(e);
 			return null;
+		}
+	}
+
+	fetchingHistory: boolean = false;
+	chatThreadOnScroll(event: UIEvent) {
+		if (this.fetchingHistory) {
+			console.log("fetchingHistory: true, aborted");
+			return;
+		}
+		if (this.chatThread.chatThreadView) {
+			if (this.chatThread.chatThreadView.scrollTop <= 10) {
+				this.fetchingHistory = true;
+				this.loadHistory(() => this.fetchingHistory = false);
+			}
 		}
 	}
 
@@ -175,46 +189,46 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 	historyPage: number = -1;
 	loadHistory(next: () => void) {
 		this.apiService.fetchHistory(this.historyPage + 1).subscribe(resp => {
-			this.historyPage = resp.number;
-			let chatMsgs = resp.content.map(x => new models.ANAChatMessage(x));
-			chatMsgs.forEach(chatMsg => {
-				let direction = chatMsg.meta.recipient.id == this.stompService.config.businessId ? vm.Direction.Outgoing : vm.Direction.Incoming;
-				switch (chatMsg.data.type) {
-					case models.MessageType.CAROUSEL:
-						if (direction == vm.Direction.Incoming)
-							this.chatThread.messages.unshift(new vm.ChatMessageVM(chatMsg, direction, ""));
-						else if (direction == vm.Direction.Outgoing)
-							this.addThreadMessageForCarouselInput(new vm.ChatMessageVM(chatMsg, direction, ""));
-						break;
-					case models.MessageType.SIMPLE:
-						this.chatThread.messages.unshift(new vm.ChatMessageVM(chatMsg, direction, ""));
-						break;
-					case models.MessageType.INPUT:
-						if (direction == vm.Direction.Outgoing) { //Ignore incoming input messages as their outgoing messages will be present (along with user given data).
-							this.chatInput.addThreadMessageForInput(new vm.ChatInputItemVM(chatMsg));
-						}
-						break;
-					default:
-						break;
-				}
-			});
-			this.chatThread.messages.sort((x, y) => x.meta.timestamp - y.meta.timestamp);
+			try {
+				this.historyPage = resp.number;
+				let chatMsgs = resp.content.map(x => new models.ANAChatMessage(x));
+				chatMsgs.forEach(chatMsg => {
+					let direction = chatMsg.meta.recipient.id == this.stompService.config.businessId ? vm.Direction.Outgoing : vm.Direction.Incoming;
+					switch (chatMsg.data.type) {
+						case models.MessageType.CAROUSEL:
+							if (direction == vm.Direction.Incoming)
+								this.chatThread.addMessage(new vm.ChatMessageVM(chatMsg, direction, ""), true);
+							else if (direction == vm.Direction.Outgoing)
+								this.addThreadMessageForCarouselInput(new vm.ChatMessageVM(chatMsg, direction, ""));
+							break;
+						case models.MessageType.SIMPLE:
+							if (direction == vm.Direction.Incoming) //Outgoing messages are never 'SIMPLE',  they are mostly 'INPUT' and rarely 'CAROUSEL'
+								this.chatThread.addMessage(new vm.ChatMessageVM(chatMsg, direction, ""), true);
+							break;
+						case models.MessageType.INPUT:
+							if (direction == vm.Direction.Outgoing) { //Ignore incoming input messages as their outgoing messages will be present (along with user given data).
+								this.chatInput.addThreadMessageForInput(new vm.ChatInputItemVM(chatMsg));
+							}
+							break;
+						default:
+							break;
+					}
+				});
+				this.chatThread.messages.sort((x, y) => x.meta.timestamp - y.meta.timestamp);
 
-			let inputChatMsgs = chatMsgs.filter(x => x.data.type == models.MessageType.INPUT).sort((x, y) => x.meta.timestamp - y.meta.timestamp);
-			if (inputChatMsgs) {
-				let latestChatInput = inputChatMsgs[inputChatMsgs.length - 1];
-				if (latestChatInput) {
-					this.chatInput.setInput(new vm.ChatInputItemVM(latestChatInput));
-					this.textInputFocus();
+				if (this.historyPage == 0) { //Display input and scroll to last only for page 0 of the history (latest page)
+					let inputChatMsgs = chatMsgs.filter(x => x.data.type == models.MessageType.INPUT).sort((x, y) => x.meta.timestamp - y.meta.timestamp);
+					if (inputChatMsgs) {
+						let latestChatInput = inputChatMsgs[inputChatMsgs.length - 1];
+						if (latestChatInput)
+							this.chatInput.setInput(new vm.ChatInputItemVM(latestChatInput));
+					}
+					this.chatThread.scrollToLast();
 				}
-			}
-
+			} catch (e) { console.log(e); }
 			if (next)
 				next();
 		}, err => {
-			console.log("Chat History Load Error:");
-			console.log(err);
-
 			if (next)
 				next();
 		});

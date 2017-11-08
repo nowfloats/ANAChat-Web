@@ -580,3 +580,19 @@ video.chat-media {
     height: 12px;
     width: 12px;
 }
+
+.chat-history-loading {
+    position: absolute;
+    bottom: -80px;
+    z-index: 100;
+    text-align: center;
+    width: 100%;
+    margin: 0 -20px;
+    padding: 10px;
+}
+
+    .chat-history-loading > mat-progress-spinner {
+        display: inline-block;
+        height: 50px;
+        width: 50px;
+    }
