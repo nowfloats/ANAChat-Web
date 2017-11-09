@@ -188,6 +188,9 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 
 	loadHistory(next: () => void) {
 		let oldMsgTimestamp = ((this.chatThread.messages && this.chatThread.messages.length > 0) ? this.chatThread.messages[0].meta.timestamp : null);
+		let oldScrollHeight: number = null;
+		if (this.chatThread.chatThreadView)
+			oldScrollHeight = this.chatThread.chatThreadView.scrollHeight;
 		this.apiService.fetchHistory(oldMsgTimestamp).subscribe(resp => {
 			try {
 				let chatMsgs = resp.content.map(x => new models.ANAChatMessage(x));
@@ -215,16 +218,17 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 					}
 				}
 
-				//this.chatThread.messages.sort((x, y) => x.meta.timestamp - y.meta.timestamp);
-
 				if (!oldMsgTimestamp) { //Display input and scroll to last only for page 0 of the history (latest page)
-					let inputChatMsgs = chatMsgs.filter(x => x.data.type == models.MessageType.INPUT).sort((x, y) => x.meta.timestamp - y.meta.timestamp);
-					if (inputChatMsgs) {
-						let latestChatInput = inputChatMsgs[inputChatMsgs.length - 1];
-						if (latestChatInput)
-							this.chatInput.setInput(new vm.ChatInputItemVM(latestChatInput));
-					}
+					if (chatMsgs[0] && chatMsgs[0].data.type == models.MessageType.INPUT)
+						this.chatInput.setInput(new vm.ChatInputItemVM(chatMsgs[0]));
 					this.chatThread.scrollToLast();
+				}
+				else {
+					if (oldScrollHeight && this.chatThread.chatThreadView) {
+						window.requestAnimationFrame(() => {
+							this.chatThread.chatThreadView.scrollTop = (this.chatThread.chatThreadView.scrollHeight - oldScrollHeight);
+						});
+					}
 				}
 			} catch (e) { console.log(e); }
 			if (next)

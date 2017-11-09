@@ -31,7 +31,7 @@ export class APIService {
 		return this.http.post(this.fileUploadEndpoint, formData, { headers }).map(res => res.json() as UploadFileResponse);
 	}
 
-	fetchHistory(oldestMsgTimestamp: number, size: number = 10) {
+	fetchHistory(oldestMsgTimestamp: number, size: number = 20) {
 		let businessId = UtilitiesService.settings.stompConfig.businessId;
 		let customerId = UtilitiesService.settings.stompConfig.customerId;
 		let api = this.chatHistoryEndpoint.replace('{userId}', customerId).replace('{businessId}', businessId).replace('{size}', size.toString());
