@@ -158,17 +158,23 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 	}
 
 	fetchingHistory: boolean = false;
+	lastScrollTop: number = 0;
 	chatThreadOnScroll(event: UIEvent) {
-		if (this.fetchingHistory) {
-			console.log("fetchingHistory: true, aborted");
-			return;
-		}
-		if (this.chatThread.chatThreadView) {
-			if (this.chatThread.chatThreadView.scrollTop <= 2) {
-				this.fetchingHistory = true;
-				this.loadHistory(() => this.fetchingHistory = false);
+		if (!this.chatThread.chatThreadView) return;
+		var currentScrollTop = this.chatThread.chatThreadView.scrollTop;
+		if (currentScrollTop < this.lastScrollTop) {
+			if (this.fetchingHistory) {
+				console.log("fetchingHistory: true, aborted");
+				return;
+			}
+			if (this.chatThread.chatThreadView) {
+				if (this.chatThread.chatThreadView.scrollTop <= 2) {
+					this.fetchingHistory = true;
+					this.loadHistory(() => this.fetchingHistory = false);
+				}
 			}
 		}
+		this.lastScrollTop = currentScrollTop;
 	}
 
 	chatTextInputOnFocus() {
