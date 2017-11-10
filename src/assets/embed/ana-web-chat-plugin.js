@@ -29,6 +29,7 @@
 		},
 		main: () => {
 			let script = document.getElementById("ana-web-chat-script");
+			let showBranding = script.getAttribute("data-show-branding") || false;
 			let stompEndpoint = script.getAttribute("data-endpoint");
 			let businessId = script.getAttribute("data-businessid");
 			let apiEndpoint = script.getAttribute("data-api-endpoint");
@@ -282,8 +283,9 @@
 		position: absolute;
 		bottom: -20px;
 		width: 100%;
+		display: ${showBranding?'block':'none'};
 	}
-
+	
 	.powered-by-ana > div {
 		display: inline;
 		/*background-color: #F5F5F5;*/
