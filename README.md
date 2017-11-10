@@ -41,7 +41,7 @@ Replace all the placeholders in the below code with the onces noted above, copy 
 <script type="text/javascript" id="ana-web-chat-script"
 
 src="http://<web-plugin.ana-chat-server.com>/assets/embed/ana-web-chat-plugin.js" 
-data-endpoint="http://<ana-chat-server.com>/wscustomers/chatcustomers-websocket"
+data-endpoint="http://<ana-chat-server.com>:1205/wscustomers/chatcustomers-websocket"
 data-businessid="chat-bot-1"
 data-primary-bg="#8cc83c"
 
@@ -50,7 +50,7 @@ data-agent-name="<Chat bot name>"
 data-agent-desc="<A small description>"
 
 data-iframe-src="http://<web-plugin.ana-chat-server.com>/"
-data-file-upload-url="http://<ana-chat-server.com>/files"
+data-api-endpoint="http://<ana-chat-server.com>/"
 data-gmaps-key="<Your Google Maps API Key>"
 
 data-primary-fg="white"
