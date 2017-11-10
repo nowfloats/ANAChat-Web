@@ -73,7 +73,12 @@
                                 </div>
                                 <span class="chat-time" [hidden]="msg.getMessageContentType()==MH.MessageContentType.Typing">
                                     <span *ngIf="msg.direction==MH.Direction.Outgoing && msg.status==MH.MessageStatus.SentTimeout"><a href="javascript:;" (click)="msg.executeRetry()" class="ana-link ana-btn-retry">Retry</a></span>
-                                    {{msg.time | date:'shortTime'}}
+                                    <span *ngIf="!msg.isToday()">
+                                        {{msg.time | date:'MMM d, h:mm a'}}
+                                    </span>
+                                    <span *ngIf="msg.isToday()">
+                                        {{msg.time | date:'shortTime'}}
+                                    </span>
                                     <i *ngIf="msg.direction==MH.Direction.Outgoing && msg.status==MH.MessageStatus.ReceivedAtServer" class="glyphicon glyphicon-ok ana-sent-tick"></i>
                                 </span>
                                 <span class="chat-stub"></span>

@@ -63,6 +63,10 @@ export class ChatMessageVM {
 		return null;
 	}
 
+	isToday() {
+		return this.time.toDateString() == (new Date()).toDateString();
+	}
+
 	constructor(chatMessage: models.ANAChatMessage, direction: Direction, ackId: string, status?: MessageStatus) {
 		this.direction = direction;
 		this.time = new Date(chatMessage.meta.timestamp);
