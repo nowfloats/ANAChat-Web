@@ -123,10 +123,12 @@ export interface AddressInput {
 	country: string;
 	pin: string;
 }
-
+export interface AddressInputField {
+	address: AddressInput;
+}
 export interface AddressInputContent extends InputContent {
 	requiredFields: string[];
-	input: AddressInput;
+	input: AddressInputField;
 }
 
 export interface GeoLoc {
@@ -261,7 +263,7 @@ export class ANAChatMessage {
 	private raw: any;
 	meta: ANAMeta;
 	data: ANAMessageData;
-	
+
 	simpleData() {
 		return this.data as SimpleMessageData;
 	}

@@ -233,7 +233,7 @@ export class ChatInputVM {
 			case models.InputType.ADDRESS:
 				{
 					let modifieldInputContent = inputVM.content as models.AddressInputContent;
-					let userAddressInput = modifieldInputContent.input;
+					let userAddressInput = modifieldInputContent.input.address;
 					return this.chatThread.addTextReply(`${[userAddressInput.line1, userAddressInput.area, userAddressInput.city, userAddressInput.state, userAddressInput.country, userAddressInput.pin].filter(x => x).join(", ")}`, ackId, timestamp, true);
 				}
 			case models.InputType.LOCATION:
@@ -421,7 +421,9 @@ export class ChatInputVM {
 						if (result != true) return;
 						let userAddressInput = dialogRef.componentInstance.givenAddress;
 						let msg = this.chatThread.addTextReply(`${[userAddressInput.line1, userAddressInput.area, userAddressInput.city, userAddressInput.state, userAddressInput.country, userAddressInput.pin].filter(x => x).join(", ")}`, ackId);
-						modifieldInputContent.input = userAddressInput;
+						modifieldInputContent.input = {
+							address: userAddressInput
+						};
 						this.stompService.sendMessage(new models.ANAChatMessage({
 							meta: UtilitiesService.getReplyMeta(inputVM.meta),
 							data: { type: inputVM.data.type, content: modifieldInputContent }
@@ -480,7 +482,7 @@ export class ChatInputVM {
 										url: assetUrl
 									};
 									let msg = this.chatThread.addMediaReply(media, '', ackId);
-									mediaInputContent.input.media = [media];
+									mediaInputContent.input = { media: [media] };
 									this.stompService.sendMessage(new models.ANAChatMessage({
 										meta: UtilitiesService.getReplyMeta(inputVM.meta),
 										data: { type: inputVM.data.type, content: mediaInputContent }
@@ -535,7 +537,7 @@ export class ChatInputVM {
 						let userInputTime = dialogRef.componentInstance.getChoosenANATime();
 						let displayTime = UtilitiesService.anaTimeDisplay(userInputTime);
 						let msg = this.chatThread.addTextReply(displayTime, ackId);
-						timeContent.input.time = userInputTime;
+						timeContent.input = { time: userInputTime };
 						this.stompService.sendMessage(new models.ANAChatMessage({
 							meta: UtilitiesService.getReplyMeta(inputVM.meta),
 							data: { type: inputVM.data.type, content: timeContent }
@@ -558,7 +560,7 @@ export class ChatInputVM {
 						let userInputDate = dialogRef.componentInstance.getChoosenANADate();
 						let displayDate = UtilitiesService.anaDateDisplay(userInputDate);
 						let msg = this.chatThread.addTextReply(displayDate, ackId);
-						dateContent.input.date = userInputDate;
+						dateContent.input = { date: userInputDate };
 						this.stompService.sendMessage(new models.ANAChatMessage({
 							meta: UtilitiesService.getReplyMeta(inputVM.meta),
 							data: { type: inputVM.data.type, content: dateContent }
@@ -726,7 +728,7 @@ export class ChatInputVM {
 				type: models.MediaType.IMAGE,
 				url: gMapUrl
 			}, "Location", ackId);
-			locInputContent.input.location = userInputLoc;
+			locInputContent.input = { location: userInputLoc };
 			this.stompService.sendMessage(new models.ANAChatMessage({
 				meta: UtilitiesService.getReplyMeta(inputMeta),
 				data: { type: inputMessageType, content: locInputContent }
