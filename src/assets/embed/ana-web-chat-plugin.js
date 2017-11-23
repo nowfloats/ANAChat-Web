@@ -65,7 +65,7 @@
 			let brandingConfig = {
 				primaryBackgroundColor: script.getAttribute("data-primary-bg") || '#8cc83c',
 				primaryForegroundColor: script.getAttribute("data-primary-fg") || 'white',
-				secondaryBackgroundColor: script.getAttribute("data-secondary-bg") || 'black',
+				secondaryBackgroundColor: script.getAttribute("data-secondary-bg") || '#3c3c3c',
 				logoUrl: script.getAttribute("data-logo-url") || 'http://ana.chat/favicon.ico',
 				agentName: script.getAttribute("data-agent-name") || 'ANA',
 				agentDesc: script.getAttribute("data-agent-desc") || 'ANA Conversation Suite',
@@ -278,10 +278,10 @@
 	}
     .powered-by-ana {
 		font-size: 11px;
-		text-align: center;
+		text-align: right;
 		z-index: 20;
 		position: absolute;
-		bottom: -20px;
+		bottom: -22px;
 		width: 100%;
 		display: ${showBranding?'block':'none'};
 	}
@@ -293,16 +293,9 @@
 		padding: 6px 24px;
 		/*box-shadow: 0px 20px 40px 1px rgba(0,0,0,0.36)*/
 	}
-
-	.powered-by-ana .powered {
-		font-style: italic;
-	}
-
-	.powered-by-ana .by-ana {
-		color: gray;
-	}
+	
     .ana-link {
-		color: inherit;
+		color: #3c3c3c;
 		text-decoration: none;
 	}
     .ana-link:hover {
@@ -317,6 +310,7 @@
 		border: 0;		
 		height: 100%;
 		width: 100vw;
+		color: #3c3c3c;
 	}
     .powered-by-ana {
 		display: none;
@@ -388,7 +382,7 @@
 							</svg>
 						</div>
 					</div>
-					<div class="powered-by-ana"><div><a class="ana-link" href="http://ana.chat" target="_blank"><span class="powered">&#x26a1;</span> <span class="by-ana">by ANA</span></a></div></div>
+					<div class="powered-by-ana"><div><a class="ana-link" href="http://ana.chat" target="_blank">powered by ana</a></div></div>
 				</div>
 				<div class="ana-minmax-btn" id="ana-max-btn">
 					<div class="max-btn" >
