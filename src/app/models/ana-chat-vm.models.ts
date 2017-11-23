@@ -659,19 +659,11 @@ export class ChatInputVM {
 			case models.InputType.LOCATION:
 			case models.InputType.MEDIA:
 			case models.InputType.LIST:
+			case models.InputType.TIME:
+			case models.InputType.DATE:
 				{
 					//These are validated in the complex input dialog itself.
 					return true;
-				}
-			case models.InputType.TIME:
-				{
-					let x = inputVM.content as models.TimeInputContent;
-					return x.input.time;
-				}
-			case models.InputType.DATE:
-				{
-					let x = inputVM.content as models.DateInputContent;
-					return x.input.date;
 				}
 			case models.InputType.OPTIONS:
 				{

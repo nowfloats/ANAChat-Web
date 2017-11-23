@@ -225,8 +225,11 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 				}
 
 				if (!oldMsgTimestamp) { //Display input and scroll to last only for page 0 of the history (latest page)
-					if (chatMsgs[0] && chatMsgs[0].data.type == models.MessageType.INPUT)
-						this.chatInput.setInput(new vm.ChatInputItemVM(chatMsgs[0]));
+					if (chatMsgs[0] && chatMsgs[0].data.type == models.MessageType.INPUT) {
+						let inputContent = chatMsgs[0].data.content as models.InputContent;
+						if (!inputContent.input || Object.keys(inputContent.input).length <= 0) 
+							this.chatInput.setInput(new vm.ChatInputItemVM(chatMsgs[0]));
+					}
 					this.chatThread.scrollToLast();
 				}
 				else {
