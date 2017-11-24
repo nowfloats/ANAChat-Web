@@ -6,7 +6,7 @@
             </div>
             <div class="ana-content">
                 <div class="title">{{settings.brandingConfig.agentName}}</div>
-                <div class="subtitle">{{settings.brandingConfig.agentDesc}} {{connectionStatusMessage()}}</div>
+                <div class="subtitle">{{settings.brandingConfig.agentDesc ? settings.brandingConfig.agentDesc + ' - ' + connectionStatusMessage() : connectionStatusMessage()}}</div>
             </div>
             <div class="ana-actions" style="display: none">
                 <a class="ana-minmax-btn" href="javascript:;" (click)="setMin(!isMin)"></a>

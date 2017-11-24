@@ -67,8 +67,8 @@
 				primaryForegroundColor: script.getAttribute("data-primary-fg") || 'white',
 				secondaryBackgroundColor: script.getAttribute("data-secondary-bg") || '#3c3c3c',
 				logoUrl: script.getAttribute("data-logo-url") || 'http://ana.chat/favicon.ico',
-				agentName: script.getAttribute("data-agent-name") || 'ANA',
-				agentDesc: script.getAttribute("data-agent-desc") || 'ANA Conversation Suite',
+				agentName: script.getAttribute("data-agent-name"),
+				agentDesc: script.getAttribute("data-agent-desc"),
 				frameHeight: script.getAttribute("data-frame-height") || '500px',
 				frameWidth: script.getAttribute("data-frame-width") || '360px',
 				frameContentWidth: script.getAttribute("data-frame-content-width") || '360px'

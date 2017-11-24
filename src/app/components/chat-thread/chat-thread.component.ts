@@ -50,11 +50,11 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 			return '';
 		switch (this.stompService.connectionStatus) {
 			case StompConnectionStatus.Connected:
-				return '- Available';
+				return 'Available';
 			case StompConnectionStatus.Connecting:
-				return '- Trying to connect...';
+				return 'Trying to connect...';
 			case StompConnectionStatus.Disconnected:
-				return '- Not available';
+				return 'Not available';
 			default:
 				return '';
 		}
