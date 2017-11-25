@@ -105,7 +105,7 @@
 
     .ana-frame-container {
       box-shadow: 0px 6px 40px 1px rgba(0,0,0,0.36);
-      border-radius: 10px;
+      border-radius: 10px !important;
       display: flex;
       flex-direction: column;
       position: relative;
@@ -164,7 +164,7 @@
       background-color: ${brandingConfig.primaryBackgroundColor};
       height: 60px;
       width: 60px;
-      border-radius: 60px;
+      border-radius: 60px !important;
       cursor: pointer;
       box-shadow: 0px 6px 40px 1px rgba(0,0,0,0.36);
     }
@@ -259,7 +259,7 @@
     }
 
 	.ana-max.ana-minmax-btn{
-		border-radius: 3px;
+		border-radius: 3px !important;
 		height: 24px;
 		width: 24px;
 		box-shadow: none;
