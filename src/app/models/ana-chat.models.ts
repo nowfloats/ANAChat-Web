@@ -62,7 +62,7 @@ export enum Bool {
 }
 
 export interface BaseContent {
-	mandatory: Bool;
+	mandatory?: Bool;
 }
 
 export interface SimpleMessageData extends ANAMessageData {
@@ -186,7 +186,7 @@ export interface TimeInputContent extends InputContent {
 export interface SimpleMedia {
 	url: string;
 	type: MediaType;
-	previewUrl: string;
+	previewUrl?: string;
 }
 
 export interface SimpleContent extends BaseContent {
@@ -217,7 +217,7 @@ export interface CarouselItem {
 export interface CarouselContent extends BaseContent {
 	items: CarouselItem[];
 	mandatory: number;
-	input: TextInput;
+	input?: TextInput;
 }
 
 export interface TextInputAttr {

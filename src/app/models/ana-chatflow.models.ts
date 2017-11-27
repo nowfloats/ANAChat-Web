@@ -130,7 +130,6 @@ export enum ConditionOperator {
 }
 
 export enum ButtonType {
-	PostText = 'PostText',
 	OpenUrl = 'OpenUrl',
 	GetText = 'GetText',
 	GetNumber = 'GetNumber',

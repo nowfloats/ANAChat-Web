@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 import * as cfm from '../models/ana-chatflow.models';
 import * as models from '../models/ana-chat.models';
 import * as vm from '../models/ana-chat-vm.models';
+import * as jsonpath from 'jsonpath';
+import * as _ from 'underscore';
+
 import { Http, Headers, URLSearchParams } from '@angular/http';
 @Injectable()
 export class SimulatorService {
@@ -41,7 +44,7 @@ export class SimulatorService {
 
 	}
 
-	private processButtons(chatNode: cfm.ChatNode) {
+	private processButtons() {
 
 	}
 
@@ -241,10 +244,6 @@ export class SimulatorService {
 			console.log(msg);
 	}
 	private processVerbsForChatNode(chatNode: cfm.ChatNode): cfm.ChatNode {
-		//let matches = json.match(/\[~(.*?)\]/g);
-		//for (var i = 0; i < matches.length; i++) {
-		//	let match = matches[i];
-		//}
 		return JSON.parse(this.processVerbs(JSON.stringify(chatNode))) as cfm.ChatNode;
 	}
 	private processVerbs(txt: string): string {
@@ -254,8 +253,19 @@ export class SimulatorService {
 			return "";
 		});
 	}
+
 	private convert(chatNode: cfm.ChatNode, section?: cfm.Section): models.ANAMessageData {
 		chatNode = this.processVerbsForChatNode(chatNode);
+		this.state.currentNode = chatNode;
+		this.state.currentSection = section || _.first(chatNode.Sections);
+		//if (this.state.currentSection) {
+		//	let currentSectionIndex = this.state.currentNode.Sections.indexOf(this.state.currentSection);
+		//	if (this.state.currentNode.Sections.length > currentSectionIndex + 1)
+		//		this.state.currentSection = this.state.currentNode.Sections;
+
+		//} else
+		//	this.state.currentSection = ((chatNode.Sections && chatNode.Sections.length > 0) ? chatNode.Sections[0] : null);
+
 		switch (chatNode.NodeType) {
 			case cfm.NodeType.ApiCall:
 				{
@@ -297,28 +307,230 @@ export class SimulatorService {
 						method: cfm.APIMethod[chatNode.ApiMethod],
 						params: reqParams,
 					}).subscribe(res => {
-
-
-
+						this.saveVariable(res.text());
+						this.processConditionNode(chatNode);
 					}, err => {
 						console.log(err);
-						this.gotoNextNode(nextNodeId); //Fall back node
+						this.gotoNextNode(nextNodeId); //Fallback node
 					});
 				}
 				break;
 			case cfm.NodeType.Card:
 				break;
 			case cfm.NodeType.Condition:
+				this.processConditionNode(chatNode);
 				break;
 
 			case cfm.NodeType.Combination:
 			default:
 				{
+					if (chatNode.Sections && chatNode.Sections.length > 0) {
+
+					} else {
+						this.processButtons();
+					}
 
 				}
 				break;
 		}
 		return null;
+	}
+
+	private convertSection(section: cfm.Section): models.ANAMessageData {
+		let anaMessageContent: models.SimpleContent = {
+			text: ''
+		};
+		let anaMessageData: models.ANAMessageData = {
+			content: anaMessageContent,
+			type: models.MessageType.SIMPLE
+		};
+		switch (section.SectionType) {
+			case cfm.SectionType.Image:
+				anaMessageContent.media = {
+					type: models.MediaType.IMAGE,
+					url: (section as cfm.ImageSection).Url,
+				}
+				anaMessageContent.text = (section as cfm.ImageSection).Title;
+				break;
+			case cfm.SectionType.Text:
+			default:
+				anaMessageContent.text = (section as cfm.ImageSection).Title;
+				break;
+			case cfm.SectionType.Gif:
+				anaMessageContent.media = {
+					type: models.MediaType.IMAGE,
+					url: (section as cfm.ImageSection).Url,
+				}
+				anaMessageContent.text = (section as cfm.ImageSection).Title;
+				break;
+			case cfm.SectionType.Audio:
+				anaMessageContent.media = {
+					type: models.MediaType.AUDIO,
+					url: (section as cfm.ImageSection).Url,
+				}
+				anaMessageContent.text = (section as cfm.ImageSection).Title;
+				break;
+			case cfm.SectionType.Video:
+				anaMessageContent.media = {
+					type: models.MediaType.VIDEO,
+					url: (section as cfm.ImageSection).Url,
+				}
+				anaMessageContent.text = (section as cfm.ImageSection).Title;
+				break;
+			case cfm.SectionType.Carousel:
+				{
+					let carContent: models.CarouselContent = {
+						items: _.map((section as cfm.CarouselSection).Items, x => {
+							return {
+								title: x.Title,
+								desc: x.Caption,
+								media: {
+									type: models.MediaType.IMAGE,
+									url: x.ImageUrl
+								},
+								options: _.map(x.Buttons, y => {
+									return {
+										title: y.Text,
+										value: y._id,
+										type: this.convertCarouselButtonType(y.Type)
+									};
+								}),
+								url: ''
+							};
+						}),
+						mandatory: 1
+					};
+					anaMessageData = {
+						type: models.MessageType.CAROUSEL,
+						content: carContent
+					};
+				}
+				break;
+		}
+		return anaMessageData;
+	}
+
+	private convertButton(chatNode: cfm.ChatNode): models.ANAMessageData {
+
+		let clickInputs = _.filter(chatNode.Buttons, x => _.contains([
+			cfm.ButtonType.DeepLink,
+			cfm.ButtonType.OpenUrl,
+			cfm.ButtonType.GetDate,
+			cfm.ButtonType.GetText,
+			cfm.ButtonType.GetVideo,
+			cfm.ButtonType.GetAddress,
+			cfm.ButtonType.GetAgent,
+			cfm.ButtonType.GetAudio,
+			cfm.ButtonType.GetDateTime,
+			cfm.ButtonType.GetItemFromSource,
+			cfm.ButtonType.GetFile,
+			cfm.ButtonType.GetLocation,
+			cfm.ButtonType.FetchChatFlow,
+			cfm.ButtonType.ShowConfirmation,
+			cfm.ButtonType.NextNode,
+		], x.ButtonType));
+
+		let textInputs = _.filter(chatNode.Buttons, x => _.contains([
+			cfm.ButtonType.GetText,
+			cfm.ButtonType.GetEmail,
+			cfm.ButtonType.GetPhoneNumber,
+			cfm.ButtonType.GetNumber,
+		], x.ButtonType));
+
+		let mandatory = 1;
+		if (textInputs && textInputs.length > 0 && clickInputs && clickInputs.length > 0) {
+			mandatory = 0;
+
+		}
+
+		if (textInputs && textInputs.length > 0) {
+
+		}
+
+		_.each(textInputs, x => {
+
+		});
+	}
+
+	private convertCarouselButtonType(srcType: cfm.CarouselButtonType): models.ButtonType {
+		switch (srcType) {
+			case cfm.CarouselButtonType.DeepLink:
+			case cfm.CarouselButtonType.OpenUrl:
+				return models.ButtonType.URL;
+			case cfm.CarouselButtonType.NextNode:
+			default:
+				return models.ButtonType.ACTION;
+		}
+	}
+
+	private processConditionNode(chatNode: cfm.ChatNode) {
+		try {
+			if (chatNode.Buttons) {
+				for (var btnIdx = 0; btnIdx < chatNode.Buttons.length; btnIdx++) {
+					let btn = chatNode.Buttons[btnIdx];
+					let firstPart = btn.ConditionMatchKey.split('.')[0];
+					let remainingParts = btn.ConditionMatchKey.split('.').splice(0, 1).join('.');
+					let jResp = JSON.parse(this.state.variables[firstPart]);
+
+					if (this.match(jsonpath.query(jResp, remainingParts) as any, btn.ConditionOperator, btn.ConditionMatchValue)) {
+						this.saveVariable(btn.VariableValue);
+						this.gotoNextNode(btn.NextNodeId);
+						break;
+					}
+				}
+			}
+		} catch (e) {
+			if (chatNode.Buttons) {
+				for (var btnIdx = 0; btnIdx < chatNode.Buttons.length; btnIdx++) {
+					let btn = chatNode.Buttons[btnIdx];
+					let leftOperand = this.state.variables[btn.ConditionMatchKey];
+					if (this.match(leftOperand, btn.ConditionOperator, btn.ConditionMatchValue)) {
+						this.saveVariable(btn.VariableValue);
+						this.gotoNextNode(btn.NextNodeId);
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	private match(left: any, op: cfm.ConditionOperator, right: any) {
+		try {
+			switch (op) {
+				case cfm.ConditionOperator.Between:
+					{
+						let r1 = right.split(',')[0];
+						let r2 = right.split(',')[1];
+
+						return (r1 < left && left < r2);
+					}
+				case cfm.ConditionOperator.NotEqualTo:
+					return left != right;
+				case cfm.ConditionOperator.GreaterThan:
+					return left > right;
+				case cfm.ConditionOperator.LessThan:
+					return left < right;
+				case cfm.ConditionOperator.GreaterThanOrEqualTo:
+					return left >= right;
+				case cfm.ConditionOperator.LessThanOrEqualTo:
+					return left <= right;
+				case cfm.ConditionOperator.In:
+					return right.split(',').indexOf(left) != -1;
+				case cfm.ConditionOperator.NotIn:
+					return right.split(',').indexOf(left) == -1;
+				case cfm.ConditionOperator.StartsWith:
+					return left.startsWith(right);
+				case cfm.ConditionOperator.EndsWith:
+					return left.endsWith(right);
+				case cfm.ConditionOperator.Contains:
+					return left.indexOf(right) != -1;
+				case cfm.ConditionOperator.EqualTo:
+				default:
+					return left == right;
+			}
+		} catch (e) {
+			console.log('Invalid operation or operands');
+		}
 	}
 }
 
