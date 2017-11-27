@@ -25,6 +25,8 @@ export class AppComponent {
 				if (settings.stompConfig && settings.stompConfig.debug)
 					console.log(settings);
 				this.setAppSettings(settings);
+			} else if (params['sim']) {
+				this.setSimulatorMode();
 			}
 		});
 	}
@@ -112,5 +114,9 @@ export class AppComponent {
 
 `;
 		this.matCSS.loadCustomMatTheme(accent, customStyle, appCSS);
+	}
+
+	setSimulatorMode() {
+
 	}
 }
