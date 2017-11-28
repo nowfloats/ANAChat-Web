@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
 import { LazyMapsAPILoader, LAZY_MAPS_API_CONFIG, LazyMapsAPILoaderConfigLiteral } from '@agm/core';
 import { ActivatedRoute } from '@angular/router';
-import { AppConfig, AppSettings, BrandingConfig, ThirdPartyConfig } from './models/ana-config.models';
+import { AppConfig, AppSettings, BrandingConfig, ThirdPartyConfig, SimulatorModeSettings } from './models/ana-config.models';
 import { StompConfig, StompService } from './services/stomp.service';
+import { SimulatorService, SimulatorState } from './services/simulator.service';
 import { APIService } from './services/api.service';
 import { UtilitiesService } from './services/utilities.service';
 import { MatCSSService } from './services/mat-css.service';
@@ -17,6 +18,7 @@ export class AppComponent {
 		private route: ActivatedRoute,
 		private apiService: APIService,
 		private stomp: StompService,
+		private simulator: SimulatorService,
 		private utils: UtilitiesService,
 		private matCSS: MatCSSService) {
 		this.route.queryParams.subscribe(params => {
@@ -26,14 +28,16 @@ export class AppComponent {
 					console.log(settings);
 				this.setAppSettings(settings);
 			} else if (params['sim']) {
-				this.setSimulatorMode();
+				let simSettings = JSON.parse(atob(params['sim'])) as SimulatorModeSettings
+				this.setSimulatorMode(simSettings);
 			}
 		});
 	}
 
 	setAppSettings(settings: AppSettings) {
+		UtilitiesService.settings = settings;
+
 		if (settings.brandingConfig) {
-			UtilitiesService.settings = settings;
 			this.getCustomStyle(settings.brandingConfig.primaryBackgroundColor, settings.brandingConfig.secondaryBackgroundColor, settings.brandingConfig.primaryForegroundColor, settings.brandingConfig.frameContentWidth);
 		}
 		if (settings.thirdPartyConfig && UtilitiesService.googleMapsConfigRef)
@@ -116,7 +120,23 @@ export class AppComponent {
 		this.matCSS.loadCustomMatTheme(accent, customStyle, appCSS);
 	}
 
-	setSimulatorMode() {
+	setSimulatorMode(settings: SimulatorModeSettings) {
+		UtilitiesService.simulatorModeSettings = settings;
+		UtilitiesService.settings = {
+			brandingConfig: settings.brandingConfig,
+			appConfig: settings.appConfig,
+			thirdPartyConfig: settings.thirdPartyConfig
+		};
+		if (settings.thirdPartyConfig && UtilitiesService.googleMapsConfigRef)
+			UtilitiesService.googleMapsConfigRef.apiKey = settings.thirdPartyConfig.googleMapsKey;
+		if (settings.appConfig) {
+			this.apiService.fileUploadEndpoint = settings.appConfig.fileUploadEndpoint;
+			this.apiService.setAPIEndpoint(settings.appConfig.apiEndpoint);
+		}
+		if (settings.brandingConfig) {
+			this.getCustomStyle(settings.brandingConfig.primaryBackgroundColor, settings.brandingConfig.secondaryBackgroundColor, settings.brandingConfig.primaryForegroundColor, settings.brandingConfig.frameContentWidth);
+		}
 
+		this.simulator.init(settings.chatFlow, settings.debug);
 	}
 }

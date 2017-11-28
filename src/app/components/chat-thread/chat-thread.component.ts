@@ -7,6 +7,7 @@ import * as models from '../../models/ana-chat.models';
 import * as config from '../../models/ana-config.models';
 import * as vm from '../../models/ana-chat-vm.models';
 import { StompService, StompConfig, StompConnectionStatus } from '../../services/stomp.service';
+import { SimulatorService, SimulatorState } from '../../services/simulator.service';
 import { APIService } from '../../services/api.service';
 import { UtilitiesService } from '../../services/utilities.service';
 import { ChainDelayService } from '../../services/chain-delay.service';
@@ -26,6 +27,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 		private stompService: StompService,
 		private apiService: APIService,
 		private dialog: MdDialog,
+		private simulator: SimulatorService,
 		private chainDelayService: ChainDelayService) {
 
 		this.chatThread = new vm.ChatThreadVM();
@@ -43,6 +45,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 	chatThread: vm.ChatThreadVM;
 	chatInput: vm.ChatInputVM;
 	settings: config.AppSettings;
+	simSettings: config.SimulatorModeSettings;
 	isMin: boolean = false;
 
 	connectionStatusMessage() {
@@ -193,6 +196,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 	}
 
 	loadHistory(next: () => void) {
+		if (!this.settings) return;
 		let oldMsgTimestamp = ((this.chatThread.messages && this.chatThread.messages.length > 0) ? this.chatThread.messages[0].meta.timestamp : null);
 		let oldScrollHeight: number = null;
 		if (this.chatThread.chatThreadView)
@@ -227,7 +231,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 				if (!oldMsgTimestamp) { //Display input and scroll to last only for page 0 of the history (latest page)
 					if (chatMsgs[0] && chatMsgs[0].data.type == models.MessageType.INPUT) {
 						let inputContent = chatMsgs[0].data.content as models.InputContent;
-						if (!inputContent.input || Object.keys(inputContent.input).length <= 0) 
+						if (!inputContent.input || Object.keys(inputContent.input).length <= 0)
 							this.chatInput.setInput(new vm.ChatInputItemVM(chatMsgs[0]));
 					}
 					this.chatThread.scrollToLast();
@@ -248,100 +252,140 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 		});
 	}
 
+	_handleMessageReceived = (message) => {
+		if (this.settings && this.settings.stompConfig && this.settings.stompConfig.debug) {
+			console.log("Socket Message Received: ");
+			console.log(message);
+		}
+
+		switch (message.data.type) {
+			case models.MessageType.INPUT:
+				{
+					this.chainDelayService.delay((queueLength) => {
+						this.chatInput.resetInputs(); //Currently only one input item is supported
+						this.chatInput.setInput(new vm.ChatInputItemVM(message));
+						this.chatThread.removeTyping();
+						this.textInputFocus();
+					}, 0);
+					break;
+				}
+			case models.MessageType.SIMPLE:
+			case models.MessageType.CAROUSEL:
+				{
+					this.chatThread.setTyping();
+					this.chainDelayService.delay((queueLength) => {
+						let msg = new vm.ChatMessageVM(message, vm.Direction.Incoming, "");
+						this.chatThread.addMessage(msg);
+
+						if (message.data.type == models.MessageType.CAROUSEL) {
+							let carItemsWithOptions = msg.carouselMessageData().content.items.filter(x => x.options && x.options.length > 0).length;
+							if (carItemsWithOptions > 0) //Hide the fixed input textbox if carousel has options
+								this.chatInput.resetInputs();
+						}
+						if (queueLength > 0)
+							this.chatThread.setTyping();
+					}, 2000);
+					break;
+				}
+			default:
+				console.log(`Unsupported message type: ${models.MessageType[message.data.type]}`);
+		}
+	};
+
 	MH = new vm.ModelHelpers();
 	ngOnInit() {
 		this.settings = UtilitiesService.settings;
+		this.simSettings = UtilitiesService.simulatorModeSettings;
 
-		this.stompService.handleMessageReceived = (message) => {
-			if (this.settings && this.settings.stompConfig && this.settings.stompConfig.debug) {
-				console.log("Socket Message Received: ");
-				console.log(message);
-			}
-
-			switch (message.data.type) {
-				case models.MessageType.INPUT:
-					{
-						this.chainDelayService.delay((queueLength) => {
-							this.chatInput.resetInputs(); //Currently only one input item is supported
-							this.chatInput.setInput(new vm.ChatInputItemVM(message));
-							this.chatThread.removeTyping();
-							this.textInputFocus();
-						}, 0);
-						break;
-					}
-				case models.MessageType.SIMPLE:
-				case models.MessageType.CAROUSEL:
-					{
-						this.chatThread.setTyping();
-						this.chainDelayService.delay((queueLength) => {
-							let msg = new vm.ChatMessageVM(message, vm.Direction.Incoming, "");
-							this.chatThread.addMessage(msg);
-
-							if (message.data.type == models.MessageType.CAROUSEL) {
-								let carItemsWithOptions = msg.carouselMessageData().content.items.filter(x => x.options && x.options.length > 0).length;
-								if (carItemsWithOptions > 0) //Hide the fixed input textbox if carousel has options
-									this.chatInput.resetInputs();
-							}
-							if (queueLength > 0)
-								this.chatThread.setTyping();
-						}, 2000);
-						break;
-					}
-				default:
-					console.log(`Unsupported message type: ${models.MessageType[message.data.type]}`);
-			}
-		};
-		this.stompService.handleConnect = () => {
-			if (this.chatThread.messages.length <= 0) {
-				let firstMsg = new models.ANAChatMessage({
-					"meta": {
-						"sender": {
-							"id": this.stompService.config.businessId,
-							"medium": 3
+		if (this.settings && this.settings.stompConfig) {
+			this.stompService.handleMessageReceived = this._handleMessageReceived;
+			this.stompService.handleConnect = () => {
+				if (this.chatThread.messages.length <= 0) {
+					let firstMsg = new models.ANAChatMessage({
+						"meta": {
+							"sender": {
+								"id": this.stompService.config.businessId,
+								"medium": 3
+							},
+							"recipient": {
+								"id": this.stompService.config.customerId,
+								"medium": 3
+							},
+							"senderType": models.SenderType.USER,
+							"timestamp": new Date().getTime(),
 						},
-						"recipient": {
-							"id": this.stompService.config.customerId,
-							"medium": 3
-						},
-						"senderType": models.SenderType.USER,
-						"timestamp": new Date().getTime(),
-					},
-					"data": {
-						"type": 2,
-						"content": {
-							"inputType": models.InputType.OPTIONS,
-							"mandatory": 1,
-							"options": [
-								{
-									"title": "Get Started",
-									"value": "GetStarted"
+						"data": {
+							"type": 2,
+							"content": {
+								"inputType": models.InputType.OPTIONS,
+								"mandatory": 1,
+								"options": [
+									{
+										"title": "Get Started",
+										"value": "GetStarted"
+									}
+								],
+								"input": {
+									"val": ""
 								}
-							],
-							"input": {
-								"val": ""
 							}
 						}
-					}
-				});
-				let msg = new vm.ChatMessageVM(firstMsg, vm.Direction.Outgoing, UtilitiesService.uuidv4()); //Pseudo, not actually added to thread. 
-				this.stompService.sendMessage(new models.ANAChatMessage({
-					meta: UtilitiesService.getReplyMeta(firstMsg.meta),
-					data: firstMsg.data
-				}), msg);
-			} else {
-				//Retrying all pending messages in the chat thread.
-				let pendingMsgs = this.chatThread.messages.filter(x => x.status == vm.MessageStatus.SentTimeout || x.status == vm.MessageStatus.SentToServer && x.retrySending);
-				pendingMsgs.forEach(x => x.retrySending());
-			}
-		};
-		this.stompService.handleAck = (messageAckId: string) => {
-			let msg = this.chatThread.messages.find(x => x.messageAckId == messageAckId);
-			if (msg) {
-				msg.status = vm.MessageStatus.ReceivedAtServer;
-				msg.clearTimeoutTimer();
-			}
-		};
+					});
+					let msg = new vm.ChatMessageVM(firstMsg, vm.Direction.Outgoing, UtilitiesService.uuidv4()); //Pseudo, not actually added to thread. 
+					this.stompService.sendMessage(new models.ANAChatMessage({
+						meta: UtilitiesService.getReplyMeta(firstMsg.meta),
+						data: firstMsg.data
+					}), msg);
+				} else {
+					//Retrying all pending messages in the chat thread.
+					let pendingMsgs = this.chatThread.messages.filter(x => x.status == vm.MessageStatus.SentTimeout || x.status == vm.MessageStatus.SentToServer && x.retrySending);
+					pendingMsgs.forEach(x => x.retrySending());
+				}
+			};
+			this.stompService.handleAck = (messageAckId: string) => {
+				let msg = this.chatThread.messages.find(x => x.messageAckId == messageAckId);
+				if (msg) {
+					msg.status = vm.MessageStatus.ReceivedAtServer;
+					msg.clearTimeoutTimer();
+				}
+			};
 
-		this.loadHistory(() => this.stompService.connect());
+			this.loadHistory(() => this.stompService.connect());
+		}
+
+		if (this.simSettings) {
+			let firstMsg = new models.ANAChatMessage({
+				"meta": {
+					"sender": {
+						"id": "ana-studio",
+						"medium": 100
+					},
+					"recipient": {
+						"id": "ana-simulator",
+						"medium": 100
+					},
+					"senderType": models.SenderType.USER,
+					"timestamp": new Date().getTime(),
+				},
+				"data": {
+					"type": 2,
+					"content": {
+						"inputType": models.InputType.OPTIONS,
+						"mandatory": 1,
+						"options": [
+							{
+								"title": "Get Started",
+								"value": "GetStarted"
+							}
+						],
+						"input": {
+							"val": "GET_STARTED"
+						}
+					}
+				}
+			});
+			this.simulator.handleMessageReceived = this._handleMessageReceived;
+			this.simulator.sendMessage(firstMsg);
+		}
 	}
 }

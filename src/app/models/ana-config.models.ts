@@ -1,4 +1,5 @@
 import { StompConfig } from '../services/stomp.service';
+import * as cfm from './ana-chatflow.models';
 
 export interface ThirdPartyConfig {
 	googleMapsKey: string;
@@ -26,4 +27,12 @@ export interface AppSettings {
 	thirdPartyConfig?: ThirdPartyConfig;
 	brandingConfig?: BrandingConfig;
 	appConfig?: AppConfig;
+}
+
+export interface SimulatorModeSettings {
+	thirdPartyConfig?: ThirdPartyConfig;
+	chatFlow?: cfm.ChatNode[];
+	brandingConfig?: BrandingConfig;
+	appConfig?: AppConfig;
+	debug?: boolean;
 }

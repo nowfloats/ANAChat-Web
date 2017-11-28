@@ -29,18 +29,19 @@ export class SimulatorService {
 		}
 	}
 
-	sendMessage(message: models.ANAChatMessage, threadMsgRef: vm.ChatMessageVM) {
+	sendMessage(message: models.ANAChatMessage, threadMsgRef?: vm.ChatMessageVM) {
 		let msg = message.extract();
 
 		this.logDebug("Sent Simulator Message: ");
 		this.logDebug(msg);
 		this.processIncomingMessage(message);
-
-		threadMsgRef.status = vm.MessageStatus.ReceivedAtServer;
+		if (threadMsgRef)
+			threadMsgRef.status = vm.MessageStatus.ReceivedAtServer;
 	}
 	handleMessageReceived: (message: models.ANAChatMessage) => any;
 
 	private processIncomingMessage(chatMsg: models.ANAChatMessage) {
+
 		let message = chatMsg.data;
 		if (message.type == models.MessageType.INPUT) {
 			let ipMsgContent = message.content as models.InputContent;
@@ -114,10 +115,14 @@ export class SimulatorService {
 					case models.InputType.OPTIONS: //Click, Non Complex
 						{
 							let ip = ipMsgContent.input as models.TextInput; //Option also has input.val
-							let clickedBtn = this.getNodeButtonById(ip.val);
-							if (clickedBtn) {
-								nextNodeId = clickedBtn.NextNodeId;
-								userData = clickedBtn.VariableValue;
+							if (ip.val == "GET_STARTED") {
+								nextNodeId = this.chatFlow[0].Id;
+							} else {
+								let clickedBtn = this.getNodeButtonById(ip.val);
+								if (clickedBtn) {
+									nextNodeId = clickedBtn.NextNodeId;
+									userData = clickedBtn.VariableValue;
+								}
 							}
 						}
 						break;
@@ -247,6 +252,7 @@ export class SimulatorService {
 	}
 
 	private processNode(chatNode: cfm.ChatNode, section?: cfm.Section) {
+
 		chatNode = this.processVerbsForChatNode(chatNode);
 		this.state.currentNode = chatNode;
 		this.state.currentSection = section || _.first(chatNode.Sections);
