@@ -45,7 +45,6 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 	chatThread: vm.ChatThreadVM;
 	chatInput: vm.ChatInputVM;
 	settings: config.AppSettings;
-	simSettings: config.SimulatorModeSettings;
 	isMin: boolean = false;
 
 	connectionStatusMessage() {
@@ -295,8 +294,6 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 	MH = new vm.ModelHelpers();
 	ngOnInit() {
 		this.settings = UtilitiesService.settings;
-		this.simSettings = UtilitiesService.simulatorModeSettings;
-
 		if (this.settings && this.settings.stompConfig) {
 			this.stompService.handleMessageReceived = this._handleMessageReceived;
 			this.stompService.handleConnect = () => {
@@ -353,7 +350,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 			this.loadHistory(() => this.stompService.connect());
 		}
 
-		if (this.simSettings) {
+		if (UtilitiesService.simulatorModeSettings) {
 			let firstMsg = new models.ANAChatMessage({
 				"meta": {
 					"sender": {

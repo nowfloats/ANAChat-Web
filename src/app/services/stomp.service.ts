@@ -6,6 +6,7 @@ import * as StompJS from 'stompjs';
 import { ChatMessageVM, MessageStatus } from '../models/ana-chat-vm.models';
 import { ANAChatMessage } from '../models/ana-chat.models';
 import { UtilitiesService } from '../services/utilities.service';
+import { SimulatorService } from '../services/simulator.service';
 
 @Injectable()
 export class StompService {
@@ -17,7 +18,7 @@ export class StompService {
 
 	connectionStatus: StompConnectionStatus;
 
-	constructor() { }
+	constructor(private sim: SimulatorService) { }
 
 	public connect(config?: StompConfig) {
 		this.clearTimer();
@@ -141,20 +142,25 @@ export class StompService {
 	}
 
 	sendMessage(message: ANAChatMessage, threadMsgRef: ChatMessageVM) {
-		let _sendMessage = () => {
-			let msg = message.extract();
+		if (UtilitiesService.simulatorModeSettings) { //Simulator mode
+			this.sim.sendMessage(message, threadMsgRef);
+		} else {
+			let _sendMessage = () => {
+				let msg = message.extract();
 
-			this.debug("Sent Socket Message: ");
-			this.debug(msg);
+				this.debug("Sent Socket Message: ");
+				this.debug(msg);
 
-			let headers = this.stompHeaders;
-			headers['tid'] = threadMsgRef.messageAckId;
-			this.client.send(`/app/message`, headers, JSON.stringify(msg));
-			threadMsgRef.status = MessageStatus.SentToServer;
-			threadMsgRef.startTimeoutTimer();
-		};
-		threadMsgRef.retrySending = _sendMessage; //Saving the context to be used for retrying in case of failure
-		_sendMessage();
+				let headers = this.stompHeaders;
+				headers['tid'] = threadMsgRef.messageAckId;
+				this.client.send(`/app/message`, headers, JSON.stringify(msg));
+				threadMsgRef.status = MessageStatus.SentToServer;
+				threadMsgRef.startTimeoutTimer();
+			};
+			threadMsgRef.retrySending = _sendMessage; //Saving the context to be used for retrying in case of failure
+			_sendMessage();
+		}
+		
 	}
 
 	handleConnect: () => void;

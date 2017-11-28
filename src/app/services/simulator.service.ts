@@ -30,10 +30,8 @@ export class SimulatorService {
 	}
 
 	sendMessage(message: models.ANAChatMessage, threadMsgRef?: vm.ChatMessageVM) {
-		let msg = message.extract();
-
 		this.logDebug("Sent Simulator Message: ");
-		this.logDebug(msg);
+		this.logDebug(message);
 		this.processIncomingMessage(message);
 		if (threadMsgRef)
 			threadMsgRef.status = vm.MessageStatus.ReceivedAtServer;
@@ -325,8 +323,7 @@ export class SimulatorService {
 					if (chatNode.Sections && chatNode.Sections.length > 0) {
 						let msg = this.convertSection(this.state.currentSection);
 						this.prepareReplyAndSend(msg);
-
-						let sectionIndex = chatNode.Sections.indexOf(this.state.currentSection);
+						let sectionIndex = chatNode.Sections.findIndex(x => x._id == this.state.currentSection._id);
 						let remainingSections = chatNode.Sections.length - (sectionIndex + 1);
 						if (remainingSections > 0) {
 							this.processNode(chatNode, chatNode.Sections[sectionIndex + 1]);
@@ -385,7 +382,7 @@ export class SimulatorService {
 				break;
 			case cfm.SectionType.Text:
 			default:
-				anaMessageContent.text = (section as cfm.ImageSection).Title;
+				anaMessageContent.text = (section as cfm.TextSection).Text;
 				break;
 			case cfm.SectionType.Gif:
 				anaMessageContent.media = {
@@ -397,16 +394,16 @@ export class SimulatorService {
 			case cfm.SectionType.Audio:
 				anaMessageContent.media = {
 					type: models.MediaType.AUDIO,
-					url: (section as cfm.ImageSection).Url,
+					url: (section as cfm.AudioSection).Url,
 				}
-				anaMessageContent.text = (section as cfm.ImageSection).Title;
+				anaMessageContent.text = (section as cfm.AudioSection).Title;
 				break;
 			case cfm.SectionType.Video:
 				anaMessageContent.media = {
 					type: models.MediaType.VIDEO,
-					url: (section as cfm.ImageSection).Url,
+					url: (section as cfm.VideoSection).Url,
 				}
-				anaMessageContent.text = (section as cfm.ImageSection).Title;
+				anaMessageContent.text = (section as cfm.VideoSection).Title;
 				break;
 			case cfm.SectionType.Carousel:
 				{
