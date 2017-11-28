@@ -242,7 +242,8 @@ export class SimulatorService {
 
 	private gotoNextNode(nextNodeId: string) {
 		let nextNode = this.getNodeById(nextNodeId);
-		this.processNode(nextNode);
+		if (nextNode)
+			this.processNode(nextNode);
 	}
 
 	private getNodeById(Id: string) {
@@ -298,13 +299,6 @@ export class SimulatorService {
 		chatNode = this.processVerbsForChatNode(chatNode);
 		this.state.currentNode = chatNode;
 		this.state.currentSection = section || _.first(chatNode.Sections);
-		//if (this.state.currentSection) {
-		//	let currentSectionIndex = this.state.currentNode.Sections.indexOf(this.state.currentSection);
-		//	if (this.state.currentNode.Sections.length > currentSectionIndex + 1)
-		//		this.state.currentSection = this.state.currentNode.Sections;
-
-		//} else
-		//	this.state.currentSection = ((chatNode.Sections && chatNode.Sections.length > 0) ? chatNode.Sections[0] : null);
 
 		switch (chatNode.NodeType) {
 			case cfm.NodeType.ApiCall:
@@ -594,8 +588,10 @@ export class SimulatorService {
 			if (chatNode.Buttons) {
 				for (var btnIdx = 0; btnIdx < chatNode.Buttons.length; btnIdx++) {
 					let btn = chatNode.Buttons[btnIdx];
-					let firstPart = btn.ConditionMatchKey.split('.')[0];
-					let remainingParts = btn.ConditionMatchKey.split('.').splice(0, 1).join('.');
+					let tokens = btn.ConditionMatchKey.split('.');
+					let firstPart = tokens[0];
+					tokens.shift();
+					let remainingParts = tokens.join('.');
 					let jResp = JSON.parse(this.state.variables[firstPart]);
 
 					if (this.match(jsonpath.query(jResp, remainingParts) as any, btn.ConditionOperator, btn.ConditionMatchValue)) {
