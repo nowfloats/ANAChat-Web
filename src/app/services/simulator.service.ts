@@ -6,6 +6,7 @@ import * as jsonpath from 'jsonpath';
 import * as _ from 'underscore';
 
 import { Http, Headers, URLSearchParams } from '@angular/http';
+import { UtilitiesService } from '../services/utilities.service';
 @Injectable()
 export class SimulatorService {
 
@@ -13,7 +14,7 @@ export class SimulatorService {
 	private chatFlow: cfm.ChatNode[] = [];
 	private state: SimulatorState;
 
-	constructor(private http: Http) { }
+	constructor(private http: Http, private utils: UtilitiesService) { }
 
 	init(chatFlow: cfm.ChatNode[], debug?: boolean) {
 		this.chatFlow = chatFlow;
@@ -38,15 +39,6 @@ export class SimulatorService {
 		threadMsgRef.status = vm.MessageStatus.ReceivedAtServer;
 	}
 	handleMessageReceived: (message: models.ANAChatMessage) => any;
-
-
-	private processNode(chatNode: cfm.ChatNode, section?: cfm.Section) {
-
-	}
-
-	private processButtons() {
-
-	}
 
 	private processIncomingMessage(chatMsg: models.ANAChatMessage) {
 		let message = chatMsg.data;
@@ -254,7 +246,7 @@ export class SimulatorService {
 		});
 	}
 
-	private convert(chatNode: cfm.ChatNode, section?: cfm.Section): models.ANAMessageData {
+	private processNode(chatNode: cfm.ChatNode, section?: cfm.Section) {
 		chatNode = this.processVerbsForChatNode(chatNode);
 		this.state.currentNode = chatNode;
 		this.state.currentSection = section || _.first(chatNode.Sections);
@@ -325,15 +317,48 @@ export class SimulatorService {
 			default:
 				{
 					if (chatNode.Sections && chatNode.Sections.length > 0) {
+						let msg = this.convertSection(this.state.currentSection);
+						this.prepareReplyAndSend(msg);
 
-					} else {
-						this.processButtons();
+						let sectionIndex = chatNode.Sections.indexOf(this.state.currentSection);
+						let remainingSections = chatNode.Sections.length - (sectionIndex + 1);
+						if (remainingSections > 0) {
+							this.processNode(chatNode, chatNode.Sections[sectionIndex + 1]);
+							return;
+						}
 					}
 
+					if (this.state.currentNode && this.state.currentNode.Buttons && this.state.currentNode.Buttons.length > 0) {
+						let inputMsgToSend = this.convertButtons(this.state.currentNode);
+						this.prepareReplyAndSend(inputMsgToSend);
+					}
 				}
 				break;
 		}
-		return null;
+	}
+
+	private prepareReplyAndSend(data: models.ANAMessageData) {
+		if (this.handleMessageReceived) {
+			let meta: models.ANAMeta = {
+				id: UtilitiesService.uuidv4(),
+				recipient: {
+					id: 'ana-studio',
+					medium: 100
+				},
+				sender: {
+					id: 'ana-simulator',
+					medium: 100
+				},
+				senderType: models.SenderType.ANA,
+				sessionId: '1234',
+				timestamp: new Date().getTime(),
+				responseTo: ''
+			};
+			this.handleMessageReceived(new models.ANAChatMessage({
+				meta: meta,
+				data: data
+			}));
+		}
 	}
 
 	private convertSection(section: cfm.Section): models.ANAMessageData {
@@ -410,7 +435,7 @@ export class SimulatorService {
 		return anaMessageData;
 	}
 
-	private convertButton(chatNode: cfm.ChatNode): models.ANAMessageData {
+	private convertButtons(chatNode: cfm.ChatNode): models.ANAMessageData {
 
 		let clickInputs = _.filter(chatNode.Buttons, x => _.contains([
 			cfm.ButtonType.DeepLink,
@@ -440,16 +465,61 @@ export class SimulatorService {
 		let mandatory = 1;
 		if (textInputs && textInputs.length > 0 && clickInputs && clickInputs.length > 0) {
 			mandatory = 0;
+		}
 
+		if (clickInputs && clickInputs.length > 0) {
+			if (_.filter(clickInputs, x => _.contains([cfm.ButtonType.NextNode, cfm.ButtonType.OpenUrl], x.ButtonType)).length > 0) { //If next node/open url button is present, only options can be sent
+				//Build options input and send
+				let optionsInput: models.OptionsInputContent = {
+					inputType: models.InputType.OPTIONS,
+					mandatory: mandatory,
+					options: _.map(clickInputs, y => {
+						return {
+							title: y.ButtonName || y.ButtonText,
+							value: y._id,
+							type: this.convertButtonType(y.ButtonType)
+						}
+					})
+				};
+				return {
+					content: optionsInput,
+					type: models.MessageType.INPUT
+				};
+			}
 		}
 
 		if (textInputs && textInputs.length > 0) {
-
+			let textInput = textInputs[0];
+			let inputMsg: models.TextInputContent = {
+				inputType: this.convertButtonTypeToInputType(textInput.ButtonType),
+				mandatory: mandatory,
+				textInputAttr: {
+					defaultText: textInput.DefaultText,
+					maxLength: textInput.MaxLength,
+					minLength: textInput.MinLength,
+					multiLine: textInput.IsMultiLine ? 1 : 0,
+					placeHolder: textInput.PlaceholderText
+				}
+			}
+			return {
+				content: inputMsg,
+				type: models.MessageType.INPUT
+			};
 		}
+	}
 
-		_.each(textInputs, x => {
-
-		});
+	private convertButtonTypeToInputType(srcType: cfm.ButtonType): models.InputType {
+		switch (srcType) {
+			default:
+			case cfm.ButtonType.GetText:
+				return models.InputType.TEXT;
+			case cfm.ButtonType.GetEmail:
+				return models.InputType.EMAIL;
+			case cfm.ButtonType.GetNumber:
+				return models.InputType.NUMERIC;
+			case cfm.ButtonType.GetPhoneNumber:
+				return models.InputType.PHONE;
+		}
 	}
 
 	private convertCarouselButtonType(srcType: cfm.CarouselButtonType): models.ButtonType {
@@ -458,6 +528,17 @@ export class SimulatorService {
 			case cfm.CarouselButtonType.OpenUrl:
 				return models.ButtonType.URL;
 			case cfm.CarouselButtonType.NextNode:
+			default:
+				return models.ButtonType.ACTION;
+		}
+	}
+
+	private convertButtonType(srcType: cfm.ButtonType): models.ButtonType {
+		switch (srcType) {
+			case cfm.ButtonType.DeepLink:
+			case cfm.ButtonType.OpenUrl:
+				return models.ButtonType.URL;
+			case cfm.ButtonType.NextNode:
 			default:
 				return models.ButtonType.ACTION;
 		}

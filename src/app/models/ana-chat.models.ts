@@ -84,12 +84,12 @@ export interface ANAMessageData {
 
 export interface InputContent extends BaseContent {
 	inputType: InputType;
-	input: any; //base input
+	input?: any; //base input
 }
 
 export interface TextInputContent extends InputContent {
-	textInputAttr: TextInputAttr;
-	input: TextInput;
+	textInputAttr?: TextInputAttr;
+	input?: TextInput;
 }
 
 export interface ListItem {
@@ -106,7 +106,7 @@ export interface OptionItem {
 
 export interface OptionsInputContent extends InputContent {
 	options: OptionItem[];
-	input: TextInput;
+	input?: TextInput;
 }
 
 export interface ListInputContent extends InputContent {
