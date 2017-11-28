@@ -30,6 +30,7 @@
 		main: () => {
 			let script = document.getElementById("ana-web-chat-script");
 			let showBranding = script.getAttribute("data-show-branding") || false;
+			let fullpage = script.getAttribute("data-fullpage") || false;
 			let stompEndpoint = script.getAttribute("data-endpoint");
 			let businessId = script.getAttribute("data-businessid");
 			let apiEndpoint = script.getAttribute("data-api-endpoint");
@@ -102,7 +103,13 @@
       font-family: 'Open Sans';
       display: block;
     }
-
+	.ana-root.fullscreen {
+		top: 50%;
+		left: 50%;
+		right: 30%;
+		transform: translate(-50%,-50%);
+	}
+	
     .ana-frame-container {
       box-shadow: 0px 6px 40px 1px rgba(0,0,0,0.36);
       border-radius: 10px !important;
@@ -369,9 +376,13 @@
       }
     }
 }
+.ana-minmax-btn.fullscreen,
+.fullscreen .ana-minmax-btn{
+	display: none;
+}
 `;
 			let htmlIntoBody = `
-				<div class="ana-root ana-min minimizeAnimation ana-hidden" id="ana-root">
+				<div class="ana-root ${fullpage ? 'ana-max maximizeAnimation fullscreen' :'ana-min minimizeAnimation ana-hidden'}" id="ana-root">
 					<div class="ana-frame-container ana-full">
 						<iframe src="${iframeUrl}" class="ana-iframe" scrolling="no"></iframe>
 					</div>
@@ -384,7 +395,7 @@
 					</div>
 					<div class="powered-by-ana"><div><a class="ana-link" href="http://ana.chat" target="_blank">powered by ana</a></div></div>
 				</div>
-				<div class="ana-minmax-btn" id="ana-max-btn">
+				<div class="ana-minmax-btn ${fullpage ?'fullscreen':''}" id="ana-max-btn">
 					<div class="max-btn" >
 						<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
 							<style type="text/css">
