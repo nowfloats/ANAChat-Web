@@ -484,7 +484,6 @@ export class SimulatorService {
 			cfm.ButtonType.GetDate,
 			cfm.ButtonType.GetVideo,
 			cfm.ButtonType.GetAddress,
-			cfm.ButtonType.GetAgent,
 			cfm.ButtonType.GetAudio,
 			cfm.ButtonType.GetDateTime,
 			cfm.ButtonType.GetItemFromSource,

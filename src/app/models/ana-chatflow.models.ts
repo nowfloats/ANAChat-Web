@@ -142,7 +142,6 @@ export enum ButtonType {
 	GetVideo = 'GetVideo',
 	NextNode = 'NextNode',
 	DeepLink = 'DeepLink',
-	GetAgent = 'GetAgent',
 	GetFile = 'GetFile',
 	ShowConfirmation = 'ShowConfirmation',
 	FetchChatFlow = 'FetchChatFlow',
