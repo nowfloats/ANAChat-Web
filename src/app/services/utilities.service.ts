@@ -7,8 +7,10 @@ import { AppSettings, BrandingConfig, AppConfig, ThirdPartyConfig, SimulatorMode
 @Injectable()
 export class UtilitiesService {
 	static googleMapsConfigRef: GoogleMapsConfig = { apiKey: '' };
-	static settings: AppSettings = {};
-	static simulatorModeSettings: SimulatorModeSettings = {};
+	static settings: AppSettings;
+	static simulatorModeSettings: SimulatorModeSettings;
+	static simulatorBusinessId = 'ana-studio';
+	static simulatorCustomerId = 'ana-simulator';
 	constructor() { }
 
 	static uuidv4() {

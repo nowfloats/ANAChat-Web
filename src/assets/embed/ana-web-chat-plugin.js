@@ -31,6 +31,7 @@
 			let script = document.getElementById("ana-web-chat-script");
 			let showBranding = script.getAttribute("data-show-branding") || false;
 			let fullpage = script.getAttribute("data-fullpage") || false;
+			let simulator = script.getAttribute("data-simulator") || false;
 			let stompEndpoint = script.getAttribute("data-endpoint");
 			let businessId = script.getAttribute("data-businessid");
 			let apiEndpoint = script.getAttribute("data-api-endpoint");
@@ -81,13 +82,26 @@
 			let thirdPartyConfig = {
 				googleMapsKey: script.getAttribute("data-gmaps-key")
 			};
-			let settings = {
-				stompConfig,
-				brandingConfig,
-				appConfig,
-				thirdPartyConfig
-			};
-			let iframeUrl = script.getAttribute("data-iframe-src") + "?s=" + btoa(JSON.stringify(settings));
+			let settings = {};
+			let iframeUrl = {};
+
+			if (simulator) {
+				settings = {
+					brandingConfig,
+					appConfig,
+					thirdPartyConfig
+				};
+				iframeUrl = script.getAttribute("data-iframe-src") + "?sim=" + btoa(JSON.stringify(settings));
+			} else {
+				settings = {
+					stompConfig,
+					brandingConfig,
+					appConfig,
+					thirdPartyConfig
+				};
+				iframeUrl = script.getAttribute("data-iframe-src") + "?s=" + btoa(JSON.stringify(settings));
+			}
+
 			let styleInHead = `
    .ana-full {
       width: 100%;
@@ -290,7 +304,7 @@
 		position: absolute;
 		bottom: -22px;
 		width: 100%;
-		display: ${showBranding?'block':'none'};
+		display: ${showBranding ? 'block' : 'none'};
 	}
 	
 	.powered-by-ana > div {
@@ -382,7 +396,7 @@
 }
 `;
 			let htmlIntoBody = `
-				<div class="ana-root ${fullpage ? 'ana-max maximizeAnimation fullscreen' :'ana-min minimizeAnimation ana-hidden'}" id="ana-root">
+				<div class="ana-root ${fullpage ? 'ana-max maximizeAnimation fullscreen' : 'ana-min minimizeAnimation ana-hidden'}" id="ana-root">
 					<div class="ana-frame-container ana-full">
 						<iframe src="${iframeUrl}" class="ana-iframe" scrolling="no"></iframe>
 					</div>
@@ -395,7 +409,7 @@
 					</div>
 					<div class="powered-by-ana"><div><a class="ana-link" href="http://ana.chat" target="_blank">powered by ana</a></div></div>
 				</div>
-				<div class="ana-minmax-btn ${fullpage ?'fullscreen':''}" id="ana-max-btn">
+				<div class="ana-minmax-btn ${fullpage ? 'fullscreen' : ''}" id="ana-max-btn">
 					<div class="max-btn" >
 						<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
 							<style type="text/css">

@@ -14,29 +14,72 @@ export class SimulatorService {
 	private chatFlow: cfm.ChatNode[] = [];
 	private state: SimulatorState;
 
-	constructor(private http: Http, private utils: UtilitiesService) { }
-
-	init(chatFlow: cfm.ChatNode[], debug?: boolean) {
-		this.chatFlow = chatFlow;
-		if (debug)
-			this.debug = debug;
-
-		if (this.chatFlow && this.chatFlow.length > 0) {
-			this.state = {
-				currentNode: this.chatFlow[0],
-				variables: {}
-			};
+	constructor(private http: Http, private utils: UtilitiesService) {
+		window.onmessage = (event) => {
+			this.logDebug('On message from sim:');
+			this.logDebug(event.data);
+			let msg = event.data as StudioMessage;
+			if (msg.type == StudioMessageType.ChatFlow) {
+				let cfMsg = (msg as ChatFlowStudioMessage);
+				this.init(cfMsg.data);
+			}
 		}
 	}
 
-	sendMessage(message: models.ANAChatMessage, threadMsgRef?: vm.ChatMessageVM) {
-		this.logDebug("Sent Simulator Message: ");
-		this.logDebug(message);
+	init(chatFlow: cfm.ChatNode[]) {
+		this.chatFlow = chatFlow;
+		this.debug = UtilitiesService.simulatorModeSettings.debug;
+
+		if (this.chatFlow && this.chatFlow.length > 0) {
+			this.state = {
+				variables: {}
+			};
+			if (this.handleInit)
+				this.handleInit();
+
+			let firstMsg = new models.ANAChatMessage({
+				"meta": {
+					"sender": {
+						"id": UtilitiesService.simulatorBusinessId,
+						"medium": 100
+					},
+					"recipient": {
+						"id": UtilitiesService.simulatorCustomerId,
+						"medium": 100
+					},
+					"senderType": models.SenderType.USER,
+					"timestamp": new Date().getTime(),
+				},
+				"data": {
+					"type": 2,
+					"content": {
+						"inputType": models.InputType.OPTIONS,
+						"mandatory": 1,
+						"options": [
+							{
+								"title": "Get Started",
+								"value": "GetStarted"
+							}
+						],
+						"input": {
+							"val": "GET_STARTED"
+						}
+					}
+				}
+			});
+			this.sendMessage(firstMsg, null);
+		}
+	}
+
+	sendMessage(message: models.ANAChatMessage, threadMsgRef: vm.ChatMessageVM) {
+		//this.logDebug("Sent Simulator Message: ");
+		//this.logDebug(message);
 		this.processIncomingMessage(message);
 		if (threadMsgRef)
 			threadMsgRef.status = vm.MessageStatus.ReceivedAtServer;
 	}
 	handleMessageReceived: (message: models.ANAChatMessage) => any;
+	handleInit: () => void;
 
 	private processIncomingMessage(chatMsg: models.ANAChatMessage) {
 
@@ -114,7 +157,8 @@ export class SimulatorService {
 						{
 							let ip = ipMsgContent.input as models.TextInput; //Option also has input.val
 							if (ip.val == "GET_STARTED") {
-								nextNodeId = this.chatFlow[0].Id;
+								let firstNode = _.first(this.chatFlow.filter(x => x.IsStartNode));
+								nextNodeId = (firstNode ? firstNode.Id : this.chatFlow[0].Id);
 							} else {
 								let clickedBtn = this.getNodeButtonById(ip.val);
 								if (clickedBtn) {
@@ -234,7 +278,7 @@ export class SimulatorService {
 			this.state.variables[this.state.currentNode.VariableName] = value;
 	}
 
-	private logDebug = (msg: any) => {
+	private logDebug(msg: any) {
 		if (this.debug)
 			console.log(msg);
 	}
@@ -444,7 +488,6 @@ export class SimulatorService {
 			cfm.ButtonType.DeepLink,
 			cfm.ButtonType.OpenUrl,
 			cfm.ButtonType.GetDate,
-			cfm.ButtonType.GetText,
 			cfm.ButtonType.GetVideo,
 			cfm.ButtonType.GetAddress,
 			cfm.ButtonType.GetAgent,
@@ -466,9 +509,8 @@ export class SimulatorService {
 		], x.ButtonType));
 
 		let mandatory = 1;
-		if (textInputs && textInputs.length > 0 && clickInputs && clickInputs.length > 0) {
+		if (textInputs && textInputs.length > 0 && clickInputs && clickInputs.length > 0)
 			mandatory = 0;
-		}
 
 		if (clickInputs && clickInputs.length > 0) {
 			if (_.filter(clickInputs, x => _.contains([cfm.ButtonType.NextNode, cfm.ButtonType.OpenUrl], x.ButtonType)).length > 0) { //If next node/open url button is present, only options can be sent
@@ -624,4 +666,16 @@ export interface SimulatorState {
 	variables?: {
 		[key: string]: string
 	}
+}
+
+export enum StudioMessageType {
+	ChatFlow
+}
+export interface StudioMessage {
+	type: StudioMessageType;
+	data: any;
+}
+
+export interface ChatFlowStudioMessage extends StudioMessage {
+	data: cfm.ChatNode[];
 }

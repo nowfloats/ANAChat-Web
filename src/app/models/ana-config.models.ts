@@ -29,9 +29,9 @@ export interface AppSettings {
 	appConfig?: AppConfig;
 }
 
+//chatFlow ?: cfm.ChatNode[];
 export interface SimulatorModeSettings {
 	thirdPartyConfig?: ThirdPartyConfig;
-	chatFlow?: cfm.ChatNode[];
 	brandingConfig?: BrandingConfig;
 	appConfig?: AppConfig;
 	debug?: boolean;

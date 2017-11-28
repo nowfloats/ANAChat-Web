@@ -31,7 +31,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 		private chainDelayService: ChainDelayService) {
 
 		this.chatThread = new vm.ChatThreadVM();
-		this.chatInput = new vm.ChatInputVM(this.dialog, this.chatThread, this.stompService, this.apiService);
+		this.chatInput = new vm.ChatInputVM(this.dialog, this.chatThread, this.stompService, this.apiService, this);
 	}
 	@ViewChild("inputContainer")
 	inputContainerRef: ElementRef;
@@ -123,7 +123,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 			carMsg.content.input.val = carOption.value;
 
 		let msg = this.chatThread.addTextReply(carOption.title, UtilitiesService.uuidv4());
-		this.stompService.sendMessage(new models.ANAChatMessage({
+		this._sendMessageDelegate(new models.ANAChatMessage({
 			meta: UtilitiesService.getReplyMeta(chatMessage.meta),
 			data: carMsg
 		}), msg);
@@ -163,6 +163,8 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 	lastScrollTop: number = 0;
 	chatThreadOnScroll(event: UIEvent) {
 		if (!this.chatThread.chatThreadView) return;
+		if (!this.settings || !this.settings.stompConfig) return;
+
 		var currentScrollTop = this.chatThread.chatThreadView.scrollTop;
 		if (currentScrollTop < this.lastScrollTop) {
 			if (this.fetchingHistory) {
@@ -195,7 +197,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 	}
 
 	loadHistory(next: () => void) {
-		if (!this.settings) return;
+		if (!this.settings || !this.settings.stompConfig) return;
 		let oldMsgTimestamp = ((this.chatThread.messages && this.chatThread.messages.length > 0) ? this.chatThread.messages[0].meta.timestamp : null);
 		let oldScrollHeight: number = null;
 		if (this.chatThread.chatThreadView)
@@ -251,7 +253,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 		});
 	}
 
-	_handleMessageReceived = (message) => {
+	_handleMessageReceivedDelegate = (message) => {
 		if (this.settings && this.settings.stompConfig && this.settings.stompConfig.debug) {
 			console.log("Socket Message Received: ");
 			console.log(message);
@@ -290,12 +292,15 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 				console.log(`Unsupported message type: ${models.MessageType[message.data.type]}`);
 		}
 	};
+	_sendMessageDelegate: (message: models.ANAChatMessage, threadMsgRef: vm.ChatMessageVM) => void;
 
 	MH = new vm.ModelHelpers();
 	ngOnInit() {
 		this.settings = UtilitiesService.settings;
 		if (this.settings && this.settings.stompConfig) {
-			this.stompService.handleMessageReceived = this._handleMessageReceived;
+			this._sendMessageDelegate = (a, b) => this.stompService.sendMessage(a, b);
+
+			this.stompService.handleMessageReceived = this._handleMessageReceivedDelegate;
 			this.stompService.handleConnect = () => {
 				if (this.chatThread.messages.length <= 0) {
 					let firstMsg = new models.ANAChatMessage({
@@ -329,7 +334,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 						}
 					});
 					let msg = new vm.ChatMessageVM(firstMsg, vm.Direction.Outgoing, UtilitiesService.uuidv4()); //Pseudo, not actually added to thread. 
-					this.stompService.sendMessage(new models.ANAChatMessage({
+					this._sendMessageDelegate(new models.ANAChatMessage({
 						meta: UtilitiesService.getReplyMeta(firstMsg.meta),
 						data: firstMsg.data
 					}), msg);
@@ -351,38 +356,13 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 		}
 
 		if (UtilitiesService.simulatorModeSettings) {
-			let firstMsg = new models.ANAChatMessage({
-				"meta": {
-					"sender": {
-						"id": "ana-studio",
-						"medium": 100
-					},
-					"recipient": {
-						"id": "ana-simulator",
-						"medium": 100
-					},
-					"senderType": models.SenderType.USER,
-					"timestamp": new Date().getTime(),
-				},
-				"data": {
-					"type": 2,
-					"content": {
-						"inputType": models.InputType.OPTIONS,
-						"mandatory": 1,
-						"options": [
-							{
-								"title": "Get Started",
-								"value": "GetStarted"
-							}
-						],
-						"input": {
-							"val": "GET_STARTED"
-						}
-					}
-				}
-			});
-			this.simulator.handleMessageReceived = this._handleMessageReceived;
-			this.simulator.sendMessage(firstMsg);
+			this.fetchingHistory = false;
+			this.simulator.handleMessageReceived = this._handleMessageReceivedDelegate;
+			this.simulator.handleInit = () => {
+				this.chatThread.messages = [];
+				this.chatInput.resetInputs();
+			};
+			this._sendMessageDelegate = (a, b) => this.simulator.sendMessage(a, b);
 		}
 	}
 }

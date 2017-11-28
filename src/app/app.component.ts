@@ -137,6 +137,6 @@ export class AppComponent {
 			this.getCustomStyle(settings.brandingConfig.primaryBackgroundColor, settings.brandingConfig.secondaryBackgroundColor, settings.brandingConfig.primaryForegroundColor, settings.brandingConfig.frameContentWidth);
 		}
 
-		this.simulator.init(settings.chatFlow, settings.debug);
+		//this.simulator.init(settings.chatFlow, settings.debug);
 	}
 }
