@@ -389,6 +389,10 @@
           height: 0px;
       }
     }
+	
+	.ana-frame-container {
+		border-radius: 0 !important;
+	}
 }
 .ana-minmax-btn.fullscreen,
 .fullscreen .ana-minmax-btn{
