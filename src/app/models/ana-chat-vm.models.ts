@@ -393,7 +393,7 @@ export class ChatInputVM {
 			this.chatThread.addTextIncoming(errorMsg, "ERROR_MSG");
 			return;
 		}
-		this.resetInputs();
+		
 		let ackId = UtilitiesService.uuidv4();
 		switch (inputVM.content.inputType) {
 			case models.InputType.TEXT:
@@ -401,6 +401,7 @@ export class ChatInputVM {
 			case models.InputType.PHONE:
 			case models.InputType.NUMERIC:
 				{
+					this.resetInputs();
 					let modifieldInputContent = inputVM.content as models.TextInputContent;
 					let msg = this.chatThread.addTextReply(modifieldInputContent.input.val, ackId);
 					this.chatThreadComponent._sendMessageDelegate(new models.ANAChatMessage({
@@ -426,6 +427,8 @@ export class ChatInputVM {
 						modifieldInputContent.input = {
 							address: userAddressInput
 						};
+						this.resetInputs();
+
 						this.chatThreadComponent._sendMessageDelegate(new models.ANAChatMessage({
 							meta: UtilitiesService.getReplyMeta(inputVM.meta),
 							data: { type: inputVM.data.type, content: modifieldInputContent }
@@ -485,10 +488,13 @@ export class ChatInputVM {
 									};
 									let msg = this.chatThread.addMediaReply(media, '', ackId);
 									mediaInputContent.input = { media: [media] };
+									this.resetInputs();
+
 									this.chatThreadComponent._sendMessageDelegate(new models.ANAChatMessage({
 										meta: UtilitiesService.getReplyMeta(inputVM.meta),
 										data: { type: inputVM.data.type, content: mediaInputContent }
 									}), msg);
+
 								}
 								else
 									alert("Error occurred while sending the file!");
@@ -513,6 +519,8 @@ export class ChatInputVM {
 					});
 					dialogRef.afterClosed().subscribe(result => {
 						if (result != true) return;
+						this.resetInputs();
+
 						let selectedListItems = dialogRef.componentInstance.choosenListValues();
 						let msg = this.chatThread.addTextReply(selectedListItems.map(x => x.text).join(', '), ackId);
 						listInputContent.input.val = selectedListItems.map(x => x.value).join(',');
@@ -535,6 +543,7 @@ export class ChatInputVM {
 					});
 					dialogRef.afterClosed().subscribe(result => {
 						if (result != true) return;
+						this.resetInputs();
 
 						let userInputTime = dialogRef.componentInstance.getChoosenANATime();
 						let displayTime = UtilitiesService.anaTimeDisplay(userInputTime);
@@ -559,6 +568,8 @@ export class ChatInputVM {
 					});
 					dialogRef.afterClosed().subscribe(result => {
 						if (result != true) return;
+						this.resetInputs();
+
 						let userInputDate = dialogRef.componentInstance.getChoosenANADate();
 						let displayDate = UtilitiesService.anaDateDisplay(userInputDate);
 						let msg = this.chatThread.addTextReply(displayDate, ackId);
@@ -572,6 +583,8 @@ export class ChatInputVM {
 				}
 			case models.InputType.OPTIONS:
 				{
+					this.resetInputs();
+
 					let optionInputContent = inputVM.content as models.OptionsInputContent;
 					let msg = this.chatThread.addTextReply(optionInputContent.input.title, ackId);
 					this.chatThreadComponent._sendMessageDelegate(new models.ANAChatMessage({
@@ -714,6 +727,7 @@ export class ChatInputVM {
 		});
 		dialogRef.afterClosed().subscribe(result => {
 			if (result != true) return;
+						this.resetInputs();
 
 			let userInputLoc = dialogRef.componentInstance.geoLoc;
 			let gMapUrl = UtilitiesService.googleMapsStaticLink(userInputLoc);
