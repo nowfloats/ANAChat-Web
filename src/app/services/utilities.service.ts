@@ -3,12 +3,11 @@ import * as moment from 'moment';
 
 import { ANATime, ANADate, ANAMeta, SenderType, GeoLoc } from '../models/ana-chat.models';
 import { GoogleMapsConfig } from '../models/google-maps-config.model';
-import { AppSettings, BrandingConfig, AppConfig, ThirdPartyConfig, SimulatorModeSettings } from '../models/ana-config.models';
+import { AppSettings, BrandingConfig, AppConfig, ThirdPartyConfig } from '../models/ana-config.models';
 @Injectable()
 export class UtilitiesService {
 	static googleMapsConfigRef: GoogleMapsConfig = { apiKey: '' };
 	static settings: AppSettings;
-	static simulatorModeSettings: SimulatorModeSettings;
 	static simulatorBusinessId = 'ana-studio';
 	static simulatorCustomerId = 'ana-simulator';
 	constructor() { }
@@ -59,7 +58,6 @@ export class UtilitiesService {
 	static googleMapsStaticLink(latLng: GeoLoc) {
 		return `https://maps.googleapis.com/maps/api/staticmap?center=${latLng.lat},${latLng.lng}&zoom=13&size=300x150&maptype=roadmap&markers=color:red|label:A|${latLng.lat},${latLng.lng}&key=${UtilitiesService.googleMapsConfigRef.apiKey}`;
 	}
-
 }
 
 export class Config {

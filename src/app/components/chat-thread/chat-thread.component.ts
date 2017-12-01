@@ -7,7 +7,7 @@ import * as models from '../../models/ana-chat.models';
 import * as config from '../../models/ana-config.models';
 import * as vm from '../../models/ana-chat-vm.models';
 import { StompService, StompConfig, StompConnectionStatus } from '../../services/stomp.service';
-import { SimulatorService, SimulatorState } from '../../services/simulator.service';
+import { SimulatorService } from '../../services/simulator.service';
 import { APIService } from '../../services/api.service';
 import { UtilitiesService } from '../../services/utilities.service';
 import { ChainDelayService } from '../../services/chain-delay.service';
@@ -163,7 +163,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 	lastScrollTop: number = 0;
 	chatThreadOnScroll(event: UIEvent) {
 		if (!this.chatThread.chatThreadView) return;
-		if (!this.settings || !this.settings.stompConfig) return;
+		if (!this.settings || this.settings.simulatorMode) return;
 
 		var currentScrollTop = this.chatThread.chatThreadView.scrollTop;
 		if (currentScrollTop < this.lastScrollTop) {
@@ -197,7 +197,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 	}
 
 	loadHistory(next: () => void) {
-		if (!this.settings || !this.settings.stompConfig) return;
+		if (!this.settings || this.settings.simulatorMode) return;
 		let oldMsgTimestamp = ((this.chatThread.messages && this.chatThread.messages.length > 0) ? this.chatThread.messages[0].meta.timestamp : null);
 		let oldScrollHeight: number = null;
 		if (this.chatThread.chatThreadView)
@@ -355,10 +355,10 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 			this.loadHistory(() => this.stompService.connect());
 		}
 
-		if (UtilitiesService.simulatorModeSettings) {
+		if (this.settings.simulatorMode) {
 			this.fetchingHistory = false;
 			this.simulator.handleMessageReceived = this._handleMessageReceivedDelegate;
-			this.simulator.handleInit = () => {
+			this.simulator.handleResetSignal = () => {
 				this.chatThread.messages = [];
 				this.chatInput.resetInputs();
 			};

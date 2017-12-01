@@ -1,5 +1,3 @@
-import { UtilitiesService } from '../services/utilities.service';
-
 export interface ANAClientInfo {
 	id: string;
 	medium: number;
@@ -254,7 +252,12 @@ export interface MediaInputContent extends InputContent {
 	input: MediaInput;
 }
 
-export class ANAChatMessage {
+export interface IANAChatMessage {
+	meta: ANAMeta;
+	data: ANAMessageData;
+}
+
+export class ANAChatMessage implements IANAChatMessage {
 	constructor(rawMessage: any) {
 		this.raw = rawMessage;
 		this.meta = this.raw.meta as ANAMeta;
