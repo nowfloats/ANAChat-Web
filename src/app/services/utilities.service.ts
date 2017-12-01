@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as moment from 'moment';
 
-import { ANATime, ANADate, ANAMeta, SenderType, GeoLoc } from '../models/ana-chat.models';
+import { ANATime, ANADate, ANAMeta, SenderType, GeoLoc, MediaType, AddressInput } from '../models/ana-chat.models';
 import { GoogleMapsConfig } from '../models/google-maps-config.model';
 import { AppSettings, BrandingConfig, AppConfig, ThirdPartyConfig } from '../models/ana-config.models';
 @Injectable()
@@ -64,6 +64,23 @@ export class UtilitiesService {
 
 	static googleMapsStaticLink(latLng: GeoLoc) {
 		return `https://maps.googleapis.com/maps/api/staticmap?center=${latLng.lat},${latLng.lng}&zoom=13&size=300x150&maptype=roadmap&markers=color:red|label:A|${latLng.lat},${latLng.lng}&key=${UtilitiesService.googleMapsConfigRef.apiKey}`;
+	}
+
+	static getAnaMediaTypeFromMIMEType(mimeType: string) {
+		let assetType: MediaType;
+		if (mimeType.startsWith('image'))
+			assetType = MediaType.IMAGE;
+		else if (mimeType.startsWith('video'))
+			assetType = MediaType.VIDEO;
+		else if (mimeType.startsWith('audio'))
+			assetType = MediaType.AUDIO;
+		else
+			assetType = MediaType.FILE;
+		return assetType;
+	}
+
+	static anaAddressDisplay(anaAddress: AddressInput) {
+		return [anaAddress.line1, anaAddress.area, anaAddress.city, anaAddress.state, anaAddress.country, anaAddress.pin].filter(x => x).join(", ");
 	}
 }
 

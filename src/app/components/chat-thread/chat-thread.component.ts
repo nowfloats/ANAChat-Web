@@ -11,6 +11,8 @@ import { SimulatorService } from '../../services/simulator.service';
 import { APIService } from '../../services/api.service';
 import { UtilitiesService } from '../../services/utilities.service';
 import { ChainDelayService } from '../../services/chain-delay.service';
+import { DomSanitizer } from '@angular/platform-browser';
+
 @Component({
 	selector: 'app-chat-thread',
 	templateUrl: './chat-thread.component.html',
@@ -28,10 +30,11 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 		private apiService: APIService,
 		private dialog: MdDialog,
 		private simulator: SimulatorService,
+		private sanitizer: DomSanitizer,
 		private chainDelayService: ChainDelayService) {
 
-		this.chatThread = new vm.ChatThreadVM();
-		this.chatInput = new vm.ChatInputVM(this.dialog, this.chatThread, this.stompService, this.apiService, this);
+		this.chatThread = new vm.ChatThreadVM(this.sanitizer);
+		this.chatInput = new vm.ChatInputVM(this.dialog, this.chatThread, this.stompService, this.apiService, this, this.sanitizer);
 	}
 	@ViewChild("inputContainer")
 	inputContainerRef: ElementRef;

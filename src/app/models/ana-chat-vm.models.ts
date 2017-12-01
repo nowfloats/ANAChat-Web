@@ -7,6 +7,7 @@ import { StompService } from '../services/stomp.service';
 import { APIService } from '../services/api.service';
 import { ComplexInputComponent, ComplexType, ComplexInputParams } from '../components/complex-input/complex-input.component';
 import { ChatThreadComponent } from '../components/chat-thread/chat-thread.component';
+import { DomSanitizer } from '@angular/platform-browser';
 
 export enum Direction {
 	Incoming,
@@ -81,7 +82,7 @@ export class ChatMessageVM {
 
 export class ChatThreadVM {
 
-	constructor() {
+	constructor(private sanitizer: DomSanitizer) {
 		this.messages = [];
 	}
 
@@ -168,6 +169,11 @@ export class ChatThreadVM {
 	}
 
 	addMessage(chatMsgVM: ChatMessageVM, insert: boolean = false) {
+		if (UtilitiesService.settings.simulatorMode) {
+			let simpleData = chatMsgVM.simpleMessageData();
+			if (simpleData.content.media && simpleData.content.media.url)
+				simpleData.content.media.url = <any>this.sanitizer.bypassSecurityTrustUrl(simpleData.content.media.url);
+		}
 		if (!insert)
 			this.removeTyping();
 		if (!chatMsgVM.meta.id || this.messages.findIndex(x => x.meta.id == chatMsgVM.meta.id) == -1) {//Not allowing duplicate messages, if meta.id is set
@@ -218,7 +224,8 @@ export class ChatInputVM {
 		public chatThread: ChatThreadVM,
 		public stompService: StompService,
 		public apiService: APIService,
-		public chatThreadComponent: ChatThreadComponent) { }
+		public chatThreadComponent: ChatThreadComponent,
+		public sanitizer: DomSanitizer) { }
 
 	insertThreadMessageForInput(inputVM: ChatInputItemVM) {
 		let ackId = "";
@@ -393,7 +400,7 @@ export class ChatInputVM {
 			this.chatThread.addTextIncoming(errorMsg, "ERROR_MSG");
 			return;
 		}
-		
+
 		let ackId = UtilitiesService.uuidv4();
 		switch (inputVM.content.inputType) {
 			case models.InputType.TEXT:
@@ -423,7 +430,7 @@ export class ChatInputVM {
 					dialogRef.afterClosed().subscribe(result => {
 						if (result != true) return;
 						let userAddressInput = dialogRef.componentInstance.givenAddress;
-						let msg = this.chatThread.addTextReply(`${[userAddressInput.line1, userAddressInput.area, userAddressInput.city, userAddressInput.state, userAddressInput.country, userAddressInput.pin].filter(x => x).join(", ")}`, ackId);
+						let msg = this.chatThread.addTextReply(`${UtilitiesService.anaAddressDisplay(userAddressInput)}`, ackId);
 						modifieldInputContent.input = {
 							address: userAddressInput
 						};
@@ -468,39 +475,23 @@ export class ChatInputVM {
 					input.onchange = () => {
 						if (input.files) {
 							let f = input.files[0];
-							this.apiService.uploadFile(f).subscribe(resp => {
-								if (resp.links) {
-									let assetUrl = resp.links[0].href;
-									let assetType: models.MediaType;
-									if (f.type.startsWith('image')) {
-										assetType = models.MediaType.IMAGE;
-									} else if (f.type.startsWith('video')) {
-										assetType = models.MediaType.VIDEO;
-									} else if (f.type.startsWith('audio')) {
-										assetType = models.MediaType.AUDIO;
-									} else {
-										assetType = models.MediaType.FILE;
-									}
-									let media: models.SimpleMedia = {
-										previewUrl: assetUrl,
-										type: assetType,
-										url: assetUrl
-									};
-									let msg = this.chatThread.addMediaReply(media, '', ackId);
-									mediaInputContent.input = { media: [media] };
-									this.resetInputs();
-
-									this.chatThreadComponent._sendMessageDelegate(new models.ANAChatMessage({
-										meta: UtilitiesService.getReplyMeta(inputVM.meta),
-										data: { type: inputVM.data.type, content: mediaInputContent }
-									}), msg);
-
-								}
-								else
-									alert("Error occurred while sending the file!");
-							}, err => {
-								alert("Unable to send file!");
-							});
+							if (!UtilitiesService.settings.simulatorMode) {
+								this.apiService.uploadFile(f).subscribe(resp => {
+									if (resp.links)
+										this.sendReplyAfterFileUpload(resp.links[0].href, f.type, mediaInputContent, ackId, inputVM);
+									else
+										alert("Error occurred while sending the file!");
+								}, err => {
+									alert("Unable to send file!");
+								});
+							} else {
+								let mediaBlob = new Blob([f], {
+									type: f.type
+								});
+								let mediaBlobUrl = URL.createObjectURL(mediaBlob, { oneTimeOnly: false });
+								window.open(mediaBlobUrl);
+								this.sendReplyAfterFileUpload(mediaBlobUrl, f.type, mediaInputContent, ackId, inputVM);
+							}
 						}
 					}
 					input.click();
@@ -727,7 +718,7 @@ export class ChatInputVM {
 		});
 		dialogRef.afterClosed().subscribe(result => {
 			if (result != true) return;
-						this.resetInputs();
+			this.resetInputs();
 
 			let userInputLoc = dialogRef.componentInstance.geoLoc;
 			let gMapUrl = UtilitiesService.googleMapsStaticLink(userInputLoc);
@@ -742,6 +733,24 @@ export class ChatInputVM {
 				data: { type: inputMessageType, content: locInputContent }
 			}), msg);
 		});
+	}
+
+	sendReplyAfterFileUpload(assetUrl: string, assetType: string, mediaInputContent: models.MediaInputContent, ackId: string, inputVM: ChatInputItemVM) {
+
+		let media = {
+			previewUrl: assetUrl,
+			type: UtilitiesService.getAnaMediaTypeFromMIMEType(assetType),
+			url: assetUrl
+		};
+
+		let msg = this.chatThread.addMediaReply(media, '', ackId);
+		mediaInputContent.input = { media: [media] };
+
+		this.resetInputs();
+		this.chatThreadComponent._sendMessageDelegate(new models.ANAChatMessage({
+			meta: UtilitiesService.getReplyMeta(inputVM.meta),
+			data: { type: inputVM.data.type, content: mediaInputContent }
+		}), msg);
 	}
 }
 
