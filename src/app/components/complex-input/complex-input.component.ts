@@ -1,6 +1,7 @@
 import { Component, OnInit, Inject, ViewChild, ElementRef, AfterViewInit, EventEmitter } from '@angular/core';
 import { MdDialogRef, MD_DIALOG_DATA, MdDatepicker, MdSelectionList, MdSelectionListOptionEvent } from '@angular/material';
-import { ANADate, ANATime, AddressInput, GeoLoc, ListItem } from '../../models/ana-chat.models';
+import { ANADate, ANATime, AddressInput, GeoLoc, ListItem, ANADateRange } from '../../models/ana-chat.models';
+import { UtilitiesService } from '../../services/utilities.service';
 import * as agm from '@agm/core';
 
 @Component({
@@ -86,7 +87,7 @@ export class ComplexInputComponent implements OnInit, AfterViewInit {
     isValid(): boolean {
         switch (this.params.Type) {
             case ComplexType.Address:
-                {
+				{
                     if (this.givenAddress &&
                         this.givenAddress.area &&
                         this.givenAddress.city &&
@@ -101,8 +102,8 @@ export class ComplexInputComponent implements OnInit, AfterViewInit {
                 }
             case ComplexType.Date:
                 {
-                    if (this.choosenDate)
-                        return true;
+					if (this.choosenDate)
+						return true;
                     else
                         return false;
                 }
@@ -147,7 +148,9 @@ export enum ComplexType {
 
 export interface ComplexInputParams {
     Type: ComplexType;
-    DefaultGeoLoc: GeoLoc;
-    ListValues: ListItem[];
-    ListMultiple: boolean;
+    DefaultGeoLoc?: GeoLoc;
+    ListValues?: ListItem[];
+	ListMultiple?: boolean;
+	AddressRequiredFields?: string[],
+	dateRange?: ANADateRange
 }

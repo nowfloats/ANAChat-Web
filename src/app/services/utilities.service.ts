@@ -21,11 +21,18 @@ export class UtilitiesService {
 	static anaDateDisplay(anaDate: ANADate) {
 		return moment({
 			year: parseInt(anaDate.year),
-			month: parseInt(anaDate.month),
+			month: parseInt(anaDate.month) - 1,
 			day: parseInt(anaDate.mday)
 		}).format("MM-DD-YYYY");
 	}
-
+	static anaDateToDate(anaDate: ANADate) {
+		return new Date(parseInt(anaDate.year), parseInt(anaDate.month) - 1, parseInt(anaDate.mday));
+	}
+	static anaTimeToDate(anaTime: ANATime) {
+		let d = new Date();
+		d.setHours(parseInt(anaTime.hour), parseInt(anaTime.minute), parseInt(anaTime.second));
+		return d;
+	}
 	static anaTimeDisplay(anaTime: ANATime) {
 		return this.timeDisplay(`${anaTime.hour}:${anaTime.minute}:${anaTime.second}`);
 	}
