@@ -489,7 +489,6 @@ export class ChatInputVM {
 									type: f.type
 								});
 								let mediaBlobUrl = URL.createObjectURL(mediaBlob, { oneTimeOnly: false });
-								window.open(mediaBlobUrl);
 								this.sendReplyAfterFileUpload(mediaBlobUrl, f.type, mediaInputContent, ackId, inputVM);
 							}
 						}
