@@ -144,7 +144,7 @@
                     <ng-container *ngSwitchDefault>
                         <div class="chat-input-click-container">
                             <div class="chat-input click">
-                                <button type="button" class="btn-click" (click)="chatInput.handleClick(chatInput.clickInput)">Choose {{MH.InputType[chatInput.clickInput.content.inputType].toLowerCase()}}</button>
+                                <button type="button" class="btn-click" (click)="chatInput.handleClick(chatInput.clickInput)">{{chatInput.clickInputTitle()}}</button>
                             </div>
                         </div>
                     </ng-container>

@@ -366,6 +366,21 @@ export class ChatInputVM {
 	textInput: ChatInputItemVM = undefined;
 	clickInput: ChatInputItemVM = undefined;
 
+	clickInputTitle() {
+		if (this.clickInput) {
+			try {
+				if (this.clickInput.content.inputType == models.InputType.MEDIA)
+					return 'Choose ' + models.MediaType[(<models.MediaInputContent>this.clickInput.content).mediaType].toLowerCase();
+				else
+					return 'Choose ' + models.InputType[this.clickInput.content.inputType].toLowerCase();
+			} catch (e) {
+				return 'Choose';
+			}
+		}
+		else
+			return "Choose";
+	}
+
 	inputCategory(inputVM: ChatInputItemVM): models.InputCategory {
 		switch (inputVM.content.inputType) {
 			case models.InputType.TEXT:
@@ -534,7 +549,7 @@ export class ChatInputVM {
 					dialogRef.afterClosed().subscribe(result => {
 						if (result != true) return;
 						this.resetInputs();
-
+						
 						let userInputTime = dialogRef.componentInstance.getChoosenANATime();
 						let displayTime = UtilitiesService.anaTimeDisplay(userInputTime);
 						let msg = this.chatThread.addTextReply(displayTime, ackId);
