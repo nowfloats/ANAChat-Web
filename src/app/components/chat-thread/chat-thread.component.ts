@@ -9,7 +9,7 @@ import * as vm from '../../models/ana-chat-vm.models';
 import { StompService, StompConfig, StompConnectionStatus } from '../../services/stomp.service';
 import { SimulatorService } from '../../services/simulator.service';
 import { APIService } from '../../services/api.service';
-import { UtilitiesService } from '../../services/utilities.service';
+import { UtilitiesService, Config } from '../../services/utilities.service';
 import { ChainDelayService } from '../../services/chain-delay.service';
 import { DomSanitizer } from '@angular/platform-browser';
 
@@ -170,10 +170,8 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 
 		var currentScrollTop = this.chatThread.chatThreadView.scrollTop;
 		if (currentScrollTop < this.lastScrollTop) {
-			if (this.fetchingHistory) {
-				console.log("fetchingHistory: true, aborted");
+			if (this.fetchingHistory)
 				return;
-			}
 			if (this.chatThread.chatThreadView) {
 				if (this.chatThread.chatThreadView.scrollTop <= 2) {
 					this.fetchingHistory = true;
@@ -297,6 +295,12 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 	};
 	_sendMessageDelegate: (message: models.ANAChatMessage, threadMsgRef: vm.ChatMessageVM) => void;
 
+	removeConsecutiveErrorsMessage() {
+		let oldMsgIdx = this.chatThread.messages.findIndex(x => x.messageAckId == Config.consecutiveErrorsMessageAckId);
+		if (oldMsgIdx != -1)
+			this.chatThread.messages.splice(oldMsgIdx, 1);
+	}
+
 	MH = new vm.ModelHelpers();
 	ngOnInit() {
 		this.settings = UtilitiesService.settings;
@@ -343,6 +347,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 					}), msg);
 				} else {
 					//Retrying all pending messages in the chat thread.
+					this.removeConsecutiveErrorsMessage();
 					let pendingMsgs = this.chatThread.messages.filter(x => x.status == vm.MessageStatus.SentTimeout || x.status == vm.MessageStatus.SentToServer && x.retrySending);
 					pendingMsgs.forEach(x => x.retrySending());
 				}
@@ -354,7 +359,10 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 					msg.clearTimeoutTimer();
 				}
 			};
-
+			this.stompService.handleConsecutiveErrorsState = () => {
+				this.removeConsecutiveErrorsMessage();
+				this.chatThread.addTextIncoming(Config.consecutiveErrorsMessageText, Config.consecutiveErrorsMessageAckId);
+			};
 			this.loadHistory(() => this.stompService.connect());
 		}
 

@@ -328,11 +328,11 @@ export class ChatInputVM {
 		let anaMeta: models.ANAMeta = {
 			id: "",
 			sender: {
-				id: UtilitiesService.settings.stompConfig ? UtilitiesService.settings.stompConfig.businessId : UtilitiesService.simulatorBusinessId,
+				id: UtilitiesService.settings.stompConfig ? UtilitiesService.settings.stompConfig.businessId : Config.simulatorBusinessId,
 				medium: 3,
 			},
 			recipient: {
-				id: UtilitiesService.settings.stompConfig ? UtilitiesService.settings.stompConfig.customerId : UtilitiesService.simulatorCustomerId,
+				id: UtilitiesService.settings.stompConfig ? UtilitiesService.settings.stompConfig.customerId : Config.simulatorCustomerId,
 				medium: 3
 			},
 			responseTo: srcMeta ? srcMeta.id : '',

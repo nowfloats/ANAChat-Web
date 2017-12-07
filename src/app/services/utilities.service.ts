@@ -8,8 +8,8 @@ import { AppSettings, BrandingConfig, AppConfig, ThirdPartyConfig } from '../mod
 export class UtilitiesService {
 	static googleMapsConfigRef: GoogleMapsConfig = { apiKey: '' };
 	static settings: AppSettings;
-	static simulatorBusinessId = 'ana-studio';
-	static simulatorCustomerId = 'ana-simulator';
+
+
 	constructor() { }
 
 	static uuidv4() {
@@ -88,4 +88,11 @@ export class Config {
 	static emailRegex: RegExp = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/;
 	static phoneRegex: RegExp = /^\+?\d{6,15}$/;
 	static numberRegex: RegExp = /^[0-9]*\.?[0-9]+$/;
+
+	static consecutiveErrorsThreshold = 5;
+	static consecutiveErrorsMessageText = "Seems like the 'all lines are busy' thing is happening with us right now. Request you to try again in some time.";
+	static consecutiveErrorsMessageAckId = "CONSECUTIVE_ERRORS_MESSAGE";
+
+	static simulatorBusinessId = 'ana-studio';
+	static simulatorCustomerId = 'ana-simulator';
 }

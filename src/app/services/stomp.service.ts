@@ -5,7 +5,7 @@ import * as StompJS from 'stompjs';
 
 import { ChatMessageVM, MessageStatus } from '../models/ana-chat-vm.models';
 import { ANAChatMessage } from '../models/ana-chat.models';
-import { UtilitiesService } from '../services/utilities.service';
+import { UtilitiesService, Config } from '../services/utilities.service';
 
 @Injectable()
 export class StompService {
@@ -14,6 +14,7 @@ export class StompService {
 	private sockInstance: any;
 	private timer: NodeJS.Timer;
 	private stompHeaders: any = {};
+	private consecutiveErrorsCount: number = 0;
 
 	connectionStatus: StompConnectionStatus;
 
@@ -65,7 +66,7 @@ export class StompService {
 	//Should be an arrow function to follow class context
 	private onConnect = (frame: StompJS.Frame) => {
 		this.clearTimer();
-
+		this.consecutiveErrorsCount = 0;
 		if (this.connectionStatus == StompConnectionStatus.Connected)
 			return;
 
@@ -104,7 +105,13 @@ export class StompService {
 
 	private onError = (error: string | StompJS.Message) => {
 		this.connectionStatus = StompConnectionStatus.Disconnected;
-
+		if (this.consecutiveErrorsCount <= Config.consecutiveErrorsThreshold) {
+			this.consecutiveErrorsCount++;
+			console.log(this.consecutiveErrorsCount);
+			if (this.consecutiveErrorsCount == Config.consecutiveErrorsThreshold)
+				if (this.handleConsecutiveErrorsState)
+					this.handleConsecutiveErrorsState();
+		}
 		if (typeof error === 'object')
 			error = error.body;
 
@@ -160,6 +167,7 @@ export class StompService {
 	handleConnect: () => void;
 	handleMessageReceived: (message: ANAChatMessage) => any;
 	handleAck: (messageAckId: string) => any;
+	handleConsecutiveErrorsState: () => void;
 }
 
 export interface StompConfig {
