@@ -9,7 +9,6 @@ export class UtilitiesService {
 	static googleMapsConfigRef: GoogleMapsConfig = { apiKey: '' };
 	static settings: AppSettings;
 
-
 	constructor() { }
 
 	static uuidv4() {

@@ -1,7 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, ViewChildren } from '@angular/core';
 import { MdDialog, MdDialogRef, MD_DIALOG_DATA } from '@angular/material';
-import * as StompJS from 'stompjs';
-import * as SockJS from 'sockjs-client';
 
 import * as models from '../../models/ana-chat.models';
 import * as config from '../../models/ana-config.models';
