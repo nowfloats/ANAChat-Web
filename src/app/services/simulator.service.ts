@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import * as models from '../models/ana-chat.models';
 import * as vm from '../models/ana-chat-vm.models';
 import * as jsonpath from 'jsonpath';
-import * as _ from 'underscore';
 
 import { Http, Headers, URLSearchParams } from '@angular/http';
 import { UtilitiesService } from '../services/utilities.service';

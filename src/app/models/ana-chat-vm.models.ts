@@ -551,7 +551,7 @@ export class ChatInputVM {
 						this.resetInputs();
 						
 						let userInputTime = dialogRef.componentInstance.getChoosenANATime();
-						let displayTime = UtilitiesService.anaTimeDisplay(userInputTime);
+						let displayTime = UtilitiesService.timeDisplay(userInputTime);
 						let msg = this.chatThread.addTextReply(displayTime, ackId);
 						timeContent.input = { time: userInputTime };
 						this.chatThreadComponent._sendMessageDelegate(new models.ANAChatMessage({

@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import * as moment from 'moment';
 
 import { ANATime, ANADate, ANAMeta, SenderType, GeoLoc, MediaType, AddressInput } from '../models/ana-chat.models';
 import { GoogleMapsConfig } from '../models/google-maps-config.model';
@@ -18,12 +17,9 @@ export class UtilitiesService {
 	}
 
 	static anaDateDisplay(anaDate: ANADate) {
-		return moment({
-			year: parseInt(anaDate.year),
-			month: parseInt(anaDate.month) - 1,
-			day: parseInt(anaDate.mday)
-		}).format("MM-DD-YYYY");
+		return `${parseInt(anaDate.mday)}-${parseInt(anaDate.month)}-${parseInt(anaDate.year)}`;
 	}
+
 	static anaDateToDate(anaDate: ANADate) {
 		return new Date(parseInt(anaDate.year), parseInt(anaDate.month) - 1, parseInt(anaDate.mday));
 	}
