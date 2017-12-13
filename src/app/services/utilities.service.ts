@@ -28,20 +28,17 @@ export class UtilitiesService {
 		d.setHours(parseInt(anaTime.hour), parseInt(anaTime.minute), parseInt(anaTime.second));
 		return d;
 	}
+
 	static anaTimeDisplay(anaTime: ANATime) {
-		return this.timeDisplay(`${anaTime.hour}:${anaTime.minute}:${anaTime.second}`);
-	}
+		let hr = parseInt(anaTime.hour);
+		let min = parseInt(anaTime.minute);
 
-	static timeDisplay(time: any) {
-		// Check correct time format and split into components
-		time = time.toString().match(/^([01]\d|2[0-3])(:)([0-5]\d)(:[0-5]\d)?$/) || [time];
+		var hours: any = hr > 12 ? hr - 12 : hr;
+		var am_pm = hr >= 12 ? "PM" : "AM";
+		hours = hours < 10 ? "0" + hours : hours;
+		var minutes = min < 10 ? "0" + min : min;
 
-		if (time.length > 1) { // If time format correct
-			time = time.slice(1);  // Remove full string match value
-			time[5] = +time[0] < 12 ? ' AM' : ' PM'; // Set AM/PM
-			time[0] = +time[0] % 12 || 12; // Adjust hours
-		}
-		return time.join(''); // return adjusted time or original string
+		return hours + ":" + minutes + " " + am_pm;
 	}
 
 	static getReplyMeta(srcMeta: ANAMeta) {
@@ -77,6 +74,11 @@ export class UtilitiesService {
 	static anaAddressDisplay(anaAddress: AddressInput) {
 		return [anaAddress.line1, anaAddress.area, anaAddress.city, anaAddress.state, anaAddress.country, anaAddress.pin].filter(x => x).join(", ");
 	}
+
+	static pad(number: number, width: number, z = '0') {
+		let n = number + '';
+		return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+	}
 }
 
 export class Config {
@@ -85,7 +87,7 @@ export class Config {
 	static numberRegex: RegExp = /^[0-9]*\.?[0-9]+$/;
 
 	static consecutiveErrorsThreshold = 5;
-	static consecutiveErrorsMessageText = "Seems like the 'all lines are busy' thing is happening with us right now. Request you to try again in some time.";
+	static consecutiveErrorsMessageText = "Uh oh, seems like you've lost your internet connection";
 	static consecutiveErrorsMessageAckId = "CONSECUTIVE_ERRORS_MESSAGE";
 
 	static simulatorBusinessId = 'ana-studio';
