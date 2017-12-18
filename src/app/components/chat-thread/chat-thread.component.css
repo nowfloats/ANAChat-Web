@@ -197,6 +197,14 @@ video.chat-media {
     margin-bottom: 19px;
 }
 
+
+/*
+Green dot up
+Carousel left right button background
+Carousel left right vertical center
+bg white
+*/
+
 .chat-input-container {
     background-color: #F5F5F5;
     border-radius: 0 0 10px 10px;
@@ -273,9 +281,11 @@ video.chat-media {
     height: 60px !important;
     background-color: white !important;
 }
+
 .ana-sent-tick {
     transform: translateY(1px);
 }
+
 .carousel-wrapper {
     position: relative;
     margin: 0 -20px;
@@ -284,18 +294,50 @@ video.chat-media {
     .carousel-wrapper > .carousel-arrow {
         position: absolute;
         top: 50%;
-        padding: 5px;
-        opacity: 0.7;
+        padding: 5px 0 0;
         cursor: pointer;
+        transform: translateY(-50%);
+        background-color: white;
+        opacity: 0.85;
     }
+
+        .carousel-wrapper > .carousel-arrow:hover {
+            opacity: 1;
+        }
 
         .carousel-wrapper > .carousel-arrow.right {
             right: 0;
+            box-shadow: -1px 0px 1px 1px rgba(0,0,0,0.1);
+            border-radius: 5px 0 0 5px;
         }
 
         .carousel-wrapper > .carousel-arrow.left {
             left: 0;
+            box-shadow: 1px 0px 1px 1px rgba(0,0,0,0.1);
+            border-radius: 0 5px 5px 0;
         }
+
+.carousel-arrow.right svg {
+    width: 24px;
+    height: 24px;
+    -moz-transform: rotate(-90deg);
+    -ms-transform: rotate(-90deg);
+    -o-transform: rotate(-90deg);
+    -webkit-transform: rotate(-90deg);
+    transform: rotate(-90deg);
+    fill: #333;
+}
+
+.carousel-arrow.left svg {
+    width: 24px;
+    height: 24px;
+    fill: #333;
+    -moz-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    -webkit-transform: rotate(90deg);
+    transform: rotate(90deg);
+}
 
 .carousel-container {
     width: 100%;
@@ -602,8 +644,8 @@ video.chat-media {
     background-color: #00DF50;
     border: 1px solid white;
     position: absolute;
-    bottom: 4px;
-    transform: translate(4px, -0.5px);
+    top: 9px;
+    transform: translate(4px, 0);
 }
 
 .chat-history-loading {

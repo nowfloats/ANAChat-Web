@@ -132,10 +132,14 @@
                                 </div>
                             </div>
                             <div class="carousel-arrow right" (click)="scrollCarousel(msg.meta.id, 'right')" [hidden]="!canScrollCarousel(msg.meta.id,'right')">
-                                <i class="glyphicon glyphicon-chevron-right"></i>
+                                <svg>
+                                    <path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"></path>
+                                </svg>
                             </div>
                             <div class="carousel-arrow left" (click)="scrollCarousel(msg.meta.id, 'left')" [hidden]="!canScrollCarousel(msg.meta.id,'left')">
-                                <i class="glyphicon glyphicon-chevron-left"></i>
+                                <svg>
+                                    <path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"></path>
+                                </svg>
                             </div>
                         </div>
                     </ng-container>
