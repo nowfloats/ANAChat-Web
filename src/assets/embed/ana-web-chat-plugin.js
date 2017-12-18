@@ -290,6 +290,17 @@
 		top: 15px;
 		right: 10px;
 	}
+	.ana-max.ana-minmax-btn:hover {
+		background-color: rgba(0,0,0,0.1);
+	}
+	.ana-max.ana-minmax-btn:hover>.min-btn {
+		opacity: 1;
+	}
+
+	.ana-max.ana-minmax-btn path{
+		fill: ${brandingConfig.primaryForegroundColor};
+	}
+
 	.ana-max.ana-minmax-btn>.max-btn{
 		display: none;
 	}
@@ -407,7 +418,7 @@
 					<div class="ana-minmax-btn" id="ana-min-btn">
 						<div class="min-btn" >
 							<svg style="width:24px;height:24px" viewBox="0 0 24 24">
-								<path fill="#fff" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+								<path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
 							</svg>
 						</div>
 					</div>

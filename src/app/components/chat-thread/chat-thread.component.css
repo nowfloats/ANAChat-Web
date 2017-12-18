@@ -122,11 +122,14 @@ app-chat-thread {
 
 .chat-time {
     font-size: 8px;
-    opacity: 0.4;
     position: absolute;
     bottom: 2px;
     right: 8px;
 }
+
+    .chat-time > span {
+        opacity: 0.4;
+    }
 
 .chat-stub {
     width: 0;
@@ -197,7 +200,6 @@ video.chat-media {
 .chat-input-container {
     background-color: #F5F5F5;
     border-radius: 0 0 10px 10px;
-    padding-top: 5px;
 }
 
 .chat-input {
@@ -217,11 +219,12 @@ video.chat-media {
         -moz-border-radius: 0 0 10px 10px;
         -webkit-border-radius: 0 0 10px 10px;
         border-radius: 0 0 10px 10px;
+        box-shadow: 0px -3px 11px 0px rgba(0, 0, 0, 0.05);
     }
 
     .chat-input button.btn-click {
         border-radius: 4px;
-        padding: 11px 23px;
+        padding: 7px 23px;
         border: transparent;
         margin: 0 10px 10px 10px;
         white-space: nowrap;
@@ -249,6 +252,7 @@ video.chat-media {
     padding: 12px 16px;
     width: 100%;
     outline: none;
+    color: black;
 }
 
 .chat-input-click-container {
@@ -269,7 +273,9 @@ video.chat-media {
     height: 60px !important;
     background-color: white !important;
 }
-
+.ana-sent-tick {
+    transform: translateY(1px);
+}
 .carousel-wrapper {
     position: relative;
     margin: 0 -20px;
@@ -307,19 +313,21 @@ video.chat-media {
 .carousel-item-media > video,
 .carousel-item-media > audio {
     width: 100%;
-    -moz-border-radius: 10px;
-    -webkit-border-radius: 10px;
-    border-radius: 10px;
+    -moz-border-radius: inherit;
+    -webkit-border-radius: inherit;
+    border-radius: inherit;
 }
+
+
 
 .carousel-item-media {
     padding: 20px 0;
     overflow: hidden;
-    border-radius: 10px;
+    border-radius: 5px;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    min-height: 180px;
+    min-height: 170px;
 }
 
 .carousel-item {
@@ -345,14 +353,14 @@ video.chat-media {
 
 .carousel-item-title {
     font-weight: bold;
-    margin: 10px 0;
+    margin:  0 0 2px 0;
     overflow: hidden;
 }
 
 .carousel-item-desc {
     color: gray;
-    font-size: small;
-    margin: 10px 0;
+    font-size: 11px;
+    margin: 2px 0 10px 0;
 }
 
 .carousel-item-button > button {
@@ -364,6 +372,7 @@ video.chat-media {
     text-transform: uppercase;
     font-size: x-small;
     text-align: center;
+    font-family: 'Open Sans';
 }
 
 .text-wrap {
@@ -416,6 +425,7 @@ video.chat-media {
 
     .ana-content > .subtitle {
         font-size: 11px;
+        opacity: 0.9;
     }
 
 .ana-actions > img {
@@ -583,6 +593,17 @@ video.chat-media {
 .chat-bottom-overlay > img {
     height: 12px;
     width: 12px;
+}
+
+.ana-online-dot {
+    border-radius: 5px;
+    height: 6px;
+    width: 6px;
+    background-color: #00DF50;
+    border: 1px solid white;
+    position: absolute;
+    bottom: 4px;
+    transform: translate(4px, -0.5px);
 }
 
 .chat-history-loading {

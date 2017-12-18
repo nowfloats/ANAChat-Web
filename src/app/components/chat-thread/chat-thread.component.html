@@ -5,8 +5,20 @@
                 <img [src]="settings.brandingConfig.logoUrl" class="ana-full" />
             </div>
             <div class="ana-content">
-                <div class="title">{{settings.brandingConfig.agentName}}</div>
-                <div class="subtitle">{{settings.brandingConfig.agentDesc ? settings.brandingConfig.agentDesc + ' - ' + connectionStatusMessage() : connectionStatusMessage()}}</div>
+                <div class="title">{{settings.brandingConfig.agentName}}<i *ngIf="connectionStatusMessage()=='Available'" [title]="connectionStatusMessage()" class="ana-online-dot"></i></div>
+                <div class="subtitle">
+                    <span *ngIf="settings.brandingConfig.agentDesc">
+                        <span *ngIf="connectionStatusMessage()!='Available'">
+                            {{settings.brandingConfig.agentDesc + ' - ' + connectionStatusMessage()}}
+                        </span>
+                        <span *ngIf="connectionStatusMessage()=='Available'">
+                            {{settings.brandingConfig.agentDesc}}
+                        </span>
+                    </span>
+                    <span *ngIf="!settings.brandingConfig.agentDesc">
+                        {{connectionStatusMessage()}}
+                    </span>
+                </div>
             </div>
             <div class="ana-actions" style="display: none">
                 <a class="ana-minmax-btn" href="javascript:;" (click)="setMin(!isMin)"></a>
@@ -41,7 +53,7 @@
                                             <ng-container *ngSwitchCase="MH.MediaType.IMAGE">
                                                 <img [src]="msg.messageData.content.media.url" class="chat-media" />
                                                 <span class="chat-bottom-overlay">
-                                                    <img src="assets/svg/picture.svg"/> {{msg.messageData.content.text||'Photo'}}
+                                                    <img src="assets/svg/picture.svg" />&nbsp; {{msg.messageData.content.text||'Photo'}}
                                                 </span>
                                             </ng-container>
                                             <ng-container *ngSwitchCase="MH.MediaType.VIDEO">
@@ -49,7 +61,7 @@
                                                     <source [src]="msg.messageData.content.media.url" />
                                                 </video>
                                                 <span class="chat-bottom-overlay">
-                                                    <img src="assets/svg/video-from-gallery.svg" /> {{msg.messageData.content.text||'Video'}}
+                                                    <img src="assets/svg/video-from-gallery.svg" />&nbsp; {{msg.messageData.content.text||'Video'}}
                                                 </span>
                                             </ng-container>
                                             <ng-container *ngSwitchCase="MH.MediaType.AUDIO">
@@ -59,13 +71,13 @@
                                                     </audio>
                                                 </div>
                                                 <span class="chat-bottom-overlay">
-                                                    <img src="assets/svg/record-voice.svg" /> {{msg.messageData.content.text||'Audio'}}
+                                                    <img src="assets/svg/record-voice.svg" />&nbsp; {{msg.messageData.content.text||'Audio'}}
                                                 </span>
                                             </ng-container>
                                             <ng-container *ngSwitchCase="MH.MediaType.FILE">
                                                 <img src="assets/svg/attachment.svg" class="chat-media chat-file-attachment" />
                                                 <span class="chat-bottom-overlay">
-                                                    <img src="assets/svg/attachment-white.svg" /> {{msg.messageData.content.text||'File'}}
+                                                    <img src="assets/svg/attachment-white.svg" />&nbsp; {{msg.messageData.content.text||'File'}}
                                                 </span>
                                             </ng-container>
                                         </div>
@@ -79,7 +91,7 @@
                                     <span *ngIf="msg.isToday()">
                                         {{msg.time | date:'shortTime'}}
                                     </span>
-                                    <i *ngIf="msg.direction==MH.Direction.Outgoing && msg.status==MH.MessageStatus.ReceivedAtServer" class="glyphicon glyphicon-ok ana-sent-tick"></i>
+                                    <svg class="ana-sent-tick" *ngIf="msg.direction==MH.Direction.Outgoing && msg.status==MH.MessageStatus.ReceivedAtServer" xmlns="http://www.w3.org/2000/svg" width="10" height="10"><path d="M9.887 1.475a.385.385 0 0 0-.544 0L3.11 7.709.657 5.257a.385.385 0 1 0-.544.544l2.724 2.724c.15.15.394.15.544 0L9.887 2.02a.385.385 0 0 0 0-.544z" /></svg>
                                 </span>
                                 <span class="chat-stub"></span>
                             </div>
@@ -152,8 +164,49 @@
             </div>
 
             <div class="chat-input text" *ngIf="chatInput.textInput">
-                <input [type]="chatInput.htmlInputType(chatInput.textInput)" [readonly]="chatInput.textInput.disabled" (keypress)="chatInput.handleKeyPress(chatInput.textInput, $event)" name="chat-text" id="chat-text" class="chat-text-input" [(ngModel)]="chatInput.textInput.content.input.val" [placeholder]="((chatInput.textInput.disabled? 'Waiting for response':(chatInput.textInput.content.textInputAttr?(chatInput.textInput.content.textInputAttr.placeHolder?chatInput.textInput.content.textInputAttr.placeHolder:''):'')))" [maxlength]="(chatInput.textInput.content.textInputAttr?chatInput.textInput.content.textInputAttr.maxLength:'')" (focus)="chatTextInputOnFocus()"/>
-                <button type="button" class="btn-icon" [disabled]="!chatInput.textInput.content.input.val" (click)="chatInput.handleClick(chatInput.textInput)"><i class="glyphicon glyphicon-send"></i></button>
+                <input [type]="chatInput.htmlInputType(chatInput.textInput)" [readonly]="chatInput.textInput.disabled" (keypress)="chatInput.handleKeyPress(chatInput.textInput, $event)" name="chat-text" id="chat-text" class="chat-text-input" [(ngModel)]="chatInput.textInput.content.input.val" [placeholder]="((chatInput.textInput.disabled? 'Waiting for response':(chatInput.textInput.content.textInputAttr?(chatInput.textInput.content.textInputAttr.placeHolder?chatInput.textInput.content.textInputAttr.placeHolder:''):'')))" [maxlength]="(chatInput.textInput.content.textInputAttr?chatInput.textInput.content.textInputAttr.maxLength:'')" (focus)="chatTextInputOnFocus()" />
+                <button type="button" class="btn-icon" [disabled]="!chatInput.textInput.content.input.val" (click)="chatInput.handleClick(chatInput.textInput)">
+                    <svg xmlns:dc="http://purl.org/dc/elements/1.1/"
+                         xmlns:cc="http://creativecommons.org/ns#"
+                         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                         xmlns:svg="http://www.w3.org/2000/svg"
+                         xmlns="http://www.w3.org/2000/svg"
+                         xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+                         xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+                         version="1.1"
+                         id="Capa_1"
+                         x="0px"
+                         y="0px"
+                         viewBox="0 0 24 24"
+                         xml:space="preserve"
+                         width="24"
+                         height="24"><metadata id="metadata39"><rdf:RDF><cc:Work rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs id="defs37" /><sodipodi:namedview pagecolor="#ffffff"
+                                                                                                                                                                                                                                                                                               bordercolor="#666666"
+                                                                                                                                                                                                                                                                                               borderopacity="1"
+                                                                                                                                                                                                                                                                                               objecttolerance="10"
+                                                                                                                                                                                                                                                                                               gridtolerance="10"
+                                                                                                                                                                                                                                                                                               guidetolerance="10"
+                                                                                                                                                                                                                                                                                               id="namedview35"
+                                                                                                                                                                                                                                                                                               showgrid="false"
+                                                                                                                                                                                                                                                                                               /><path class="send-button" d="m 23.877804,0.98290261 c -0.106834,-0.0937 -0.25887,-0.11544004 -0.387731,-0.0557 L 0.2075883,11.744933 C 0.08224315,11.803233 0.00152575,11.928253 1.9026728e-5,12.066443 -0.00148797,12.204633 0.07657503,12.331413 0.20070042,12.392323 l 6.58890748,3.23358 c 0.1208249,0.0593 0.2648965,0.0459 0.3728067,-0.0347 l 6.4062344,-4.78808 -5.0291597,5.17308 c -0.071749,0.0738 -0.1083407,0.17493 -0.1004483,0.27753 l 0.5007348,6.52118 c 0.011121,0.1445 0.107982,0.26805 0.2456679,0.31332 0.036807,0.0121 0.074619,0.0179 0.1119999,0.0179 0.102529,0 0.2022599,-0.044 0.2716409,-0.12434 l 3.4971795,-4.05252 4.323224,2.06565 c 0.09385,0.0448 0.202475,0.0467 0.297829,0.005 0.09535,-0.0415 0.167964,-0.12233 0.199103,-0.22149 L 23.98349,1.3598326 c 0.04262,-0.1356 0.0011,-0.28348 -0.105686,-0.37717999 z"
+                                                                                                                                                                                                                                                                                                                                       id="path3"
+                                                                                                                                                                                                                                                                                                                                       inkscape:connector-curvature="0" /><g id="g5"
+                                                                                                                                                                                                                                                                                                                                                                             transform="translate(0,-310.5)" /><g id="g7"
+                                                                                                                                                                                                                                                                                                                                                                                                                  transform="translate(0,-310.5)" /><g id="g9"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                       transform="translate(0,-310.5)" /><g id="g11"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            transform="translate(0,-310.5)" /><g id="g13"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 transform="translate(0,-310.5)" /><g id="g15"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      transform="translate(0,-310.5)" /><g id="g17"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           transform="translate(0,-310.5)" /><g id="g19"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                transform="translate(0,-310.5)" /><g id="g21"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     transform="translate(0,-310.5)" /><g id="g23"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          transform="translate(0,-310.5)" /><g id="g25"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               transform="translate(0,-310.5)" /><g id="g27"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    transform="translate(0,-310.5)" /><g id="g29"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         transform="translate(0,-310.5)" /><g id="g31"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              transform="translate(0,-310.5)" /><g id="g33"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   transform="translate(0,-310.5)" /></svg>
+                </button>
             </div>
         </div>
     </div>

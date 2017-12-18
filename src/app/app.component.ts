@@ -76,6 +76,12 @@ export class AppComponent {
   color: ${accentFG || 'white'};
 }
 
+.ana-sent-tick path{
+	fill: ${accent || '#8cc83c'};
+}
+.ana-sent-tick{
+  color: ${accent || '#8cc83c'};
+}
 .chat-message-item.outgoing {
   border-right-color: ${secondary || 'black'};
 }
@@ -96,7 +102,12 @@ export class AppComponent {
   background-color: ${accent || '#8cc83c'};
   color: ${accentFG || 'white'};
 }
-
+.chat-text-input{
+	caret-color: ${accent || '#8cc83c'};
+}
+path.send-button{
+  fill: ${accent || '#8cc83c'};
+}
 .ana-logo > img {
   background-color: ${accentFG || 'white'};
   border: 2px solid ${accentFG || 'white'};

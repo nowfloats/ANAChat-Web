@@ -1,5 +1,5 @@
 import { BrowserModule, DomSanitizer } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpModule } from '@angular/http';
@@ -71,6 +71,7 @@ import { ChainDelayService } from './services/chain-delay.service';
 	bootstrap: [AppComponent],
 	entryComponents: [
 		ComplexInputComponent
-	]
+	],
+	schemas: [NO_ERRORS_SCHEMA]
 })
 export class AppModule { }

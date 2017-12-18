@@ -3,7 +3,7 @@ import { MdDialog } from '@angular/material';
 
 import * as models from './ana-chat.models';
 import { UtilitiesService, Config } from '../services/utilities.service';
-import { StompService } from '../services/stomp.service';
+import { StompService, StompConnectionStatus } from '../services/stomp.service';
 import { APIService } from '../services/api.service';
 import { ComplexInputComponent, ComplexType, ComplexInputParams } from '../components/complex-input/complex-input.component';
 import { ChatThreadComponent } from '../components/chat-thread/chat-thread.component';
@@ -782,4 +782,5 @@ export class ModelHelpers {
 	MessageContentType = models.MessageContentType;
 	MediaType = models.MediaType;
 	InputType = models.InputType;
+	StompConnectionStatus = StompConnectionStatus;
 }
