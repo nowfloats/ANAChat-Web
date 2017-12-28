@@ -27,18 +27,24 @@
 		deleteCookie: (name, path) => {
 			setCookie(name, '', -1, path)
 		},
-		main: () => {
-			let script = document.getElementById("ana-web-chat-script");
-			let showBranding = script.getAttribute("data-show-branding") || false;
-			let fullpage = script.getAttribute("data-fullpage") || false;
-			let simulator = script.getAttribute("data-simulator") || false;
-			let stompEndpoint = script.getAttribute("data-endpoint");
-			let businessId = script.getAttribute("data-businessid");
-			let apiEndpoint = script.getAttribute("data-api-endpoint");
+		scriptEle: () => {
+			return document.getElementById("ana-web-chat-script");
+		},
+		getAttr: (script, attr) => {
+			return (script.getAttribute('ana-' + attr) || script.getAttribute('data-' + attr));
+		},
+		main: (givenCustomerId) => {
+			let script = base.scriptEle();
+			let showBranding = base.getAttr(script, "show-branding") || false;
+			let fullpage = base.getAttr(script, "fullpage") || false;
+			let simulator = base.getAttr(script, "simulator") || false;
+			let stompEndpoint = base.getAttr(script, "endpoint");
+			let businessId = base.getAttr(script, "businessid");
+			let apiEndpoint = base.getAttr(script, "api-endpoint");
 			let fileUploadUrl = "";
 
 			if (!apiEndpoint) {
-				fileUploadUrl = script.getAttribute("data-file-upload-url");
+				fileUploadUrl = base.getAttr(script, "file-upload-url");
 				if (fileUploadUrl) {
 					let _url = base.parseURL(fileUploadUrl);
 					apiEndpoint = _url.protocol + "://" + _url.host;
@@ -51,7 +57,11 @@
 
 				fileUploadUrl = apiEndpoint + "files";
 			}
+
 			let customerIdCookieName = 'ana-customerid-for-' + businessId;
+			if (givenCustomerId) {
+				base.setCookie(customerIdCookieName, givenCustomerId);
+			}
 			let customerId = base.getCookie(customerIdCookieName); //Get customer id for this business
 			if (!customerId) {
 				customerId = base.uuidv4(); //new customer id
@@ -62,25 +72,25 @@
 				endpoint: stompEndpoint,
 				customerId: customerId,
 				businessId: businessId,
-				debug: script.getAttribute("data-debug") || false
+				debug: base.getAttr(script, "debug") || false
 			};
 			let brandingConfig = {
-				primaryBackgroundColor: script.getAttribute("data-primary-bg") || '#8cc83c',
-				primaryForegroundColor: script.getAttribute("data-primary-fg") || 'white',
-				secondaryBackgroundColor: script.getAttribute("data-secondary-bg") || '#3c3c3c',
-				logoUrl: script.getAttribute("data-logo-url") || 'http://ana.chat/favicon.ico',
-				agentName: script.getAttribute("data-agent-name"),
-				agentDesc: script.getAttribute("data-agent-desc"),
-				frameHeight: script.getAttribute("data-frame-height") || '500px',
-				frameWidth: script.getAttribute("data-frame-width") || '360px',
-				frameContentWidth: script.getAttribute("data-frame-content-width") || '360px'
+				primaryBackgroundColor: base.getAttr(script, "primary-bg") || '#8cc83c',
+				primaryForegroundColor: base.getAttr(script, "primary-fg") || 'white',
+				secondaryBackgroundColor: base.getAttr(script, "secondary-bg") || '#3c3c3c',
+				logoUrl: base.getAttr(script, "logo-url") || 'http://ana.chat/favicon.ico',
+				agentName: base.getAttr(script, "agent-name"),
+				agentDesc: base.getAttr(script, "agent-desc"),
+				frameHeight: base.getAttr(script, "frame-height") || '500px',
+				frameWidth: base.getAttr(script, "frame-width") || '360px',
+				frameContentWidth: base.getAttr(script, "frame-content-width") || '360px'
 			};
 			let appConfig = {
 				fileUploadEndpoint: fileUploadUrl,
 				apiEndpoint: apiEndpoint
 			};
 			let thirdPartyConfig = {
-				googleMapsKey: script.getAttribute("data-gmaps-key")
+				googleMapsKey: base.getAttr(script, "gmaps-key")
 			};
 			let settings = {};
 			let iframeUrl = {};
@@ -91,7 +101,7 @@
 					appConfig,
 					thirdPartyConfig
 				};
-				iframeUrl = script.getAttribute("data-iframe-src") + "?sim=" + btoa(JSON.stringify(settings));
+				iframeUrl = base.getAttr(script, "iframe-src") + "?sim=" + btoa(JSON.stringify(settings));
 			} else {
 				settings = {
 					stompConfig,
@@ -99,7 +109,7 @@
 					appConfig,
 					thirdPartyConfig
 				};
-				iframeUrl = script.getAttribute("data-iframe-src") + "?s=" + btoa(JSON.stringify(settings));
+				iframeUrl = base.getAttr(script, "iframe-src") + "?s=" + btoa(JSON.stringify(settings));
 			}
 
 			let styleInHead = `
@@ -494,6 +504,11 @@
 			document.body.appendChild(scriptEle);
 		}
 	}
-
-	base.main();
+	let script = base.scriptEle();
+	let manualInit = base.getAttr(script, "manual-init");
+	if (manualInit == 'true') {
+		window.Ana = base.main;
+	} else {
+		base.main();
+	}
 })();

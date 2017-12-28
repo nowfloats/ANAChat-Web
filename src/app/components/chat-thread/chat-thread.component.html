@@ -5,18 +5,18 @@
                 <img [src]="settings.brandingConfig.logoUrl" class="ana-full" />
             </div>
             <div class="ana-content">
-                <div class="title">{{settings.brandingConfig.agentName}}<i *ngIf="connectionStatusMessage()=='Available'" [title]="connectionStatusMessage()" class="ana-online-dot"></i></div>
+                <div class="title">{{settings.brandingConfig.agentName}}</div>
                 <div class="subtitle">
                     <span *ngIf="settings.brandingConfig.agentDesc">
                         <span *ngIf="connectionStatusMessage()!='Available'">
-                            {{settings.brandingConfig.agentDesc + ' - ' + connectionStatusMessage()}}
+                            {{settings.brandingConfig.agentDesc}} - <i *ngIf="connectionStatusMessage()=='Available'" [title]="connectionStatusMessage()" class="ana-online-dot"></i> {{ connectionStatusMessage()}}
                         </span>
                         <span *ngIf="connectionStatusMessage()=='Available'">
-                            {{settings.brandingConfig.agentDesc}}
+                            {{settings.brandingConfig.agentDesc}} <i [title]="connectionStatusMessage()" class="ana-online-dot"></i>
                         </span>
                     </span>
                     <span *ngIf="!settings.brandingConfig.agentDesc">
-                        {{connectionStatusMessage()}}
+                        <i *ngIf="connectionStatusMessage()=='Available'" [title]="connectionStatusMessage()" class="ana-online-dot"></i>{{connectionStatusMessage()}}
                     </span>
                 </div>
             </div>
@@ -51,13 +51,13 @@
                                     <ng-container *ngSwitchCase="MH.MessageContentType.Media">
                                         <div [ngSwitch]="msg.messageData.content.media.type">
                                             <ng-container *ngSwitchCase="MH.MediaType.IMAGE">
-                                                <img [src]="msg.messageData.content.media.url" class="chat-media" />
+                                                <img [src]="msg.messageData.content.media.url" class="chat-media" (click)="openWindow(msg.messageData.content.media.url)" [class.clickable]="msg.messageData.content.media.url"/>
                                                 <span class="chat-bottom-overlay">
                                                     <img src="assets/svg/picture.svg" />&nbsp; {{msg.messageData.content.text||'Photo'}}
                                                 </span>
                                             </ng-container>
                                             <ng-container *ngSwitchCase="MH.MediaType.VIDEO">
-                                                <video controls="controls" class="chat-media">
+                                                <video controls="controls" class="chat-media" (click)="openWindow(msg.messageData.content.media.url)" [class.clickable]="msg.messageData.content.media.url">
                                                     <source [src]="msg.messageData.content.media.url" />
                                                 </video>
                                                 <span class="chat-bottom-overlay">

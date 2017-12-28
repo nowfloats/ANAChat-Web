@@ -9,7 +9,7 @@ import { SimulatorService } from '../../services/simulator.service';
 import { APIService } from '../../services/api.service';
 import { UtilitiesService, Config } from '../../services/utilities.service';
 import { ChainDelayService } from '../../services/chain-delay.service';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 @Component({
 	selector: 'app-chat-thread',
@@ -32,7 +32,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 		private chainDelayService: ChainDelayService) {
 
 		this.chatThread = new vm.ChatThreadVM(this.sanitizer);
-		this.chatInput = new vm.ChatInputVM(this.dialog, this.chatThread, this.stompService, this.apiService, this, this.sanitizer);
+		this.chatInput = new vm.ChatInputVM(this.dialog, this.chatThread, this.apiService, this, this.sanitizer);
 	}
 	@ViewChild("inputContainer")
 	inputContainerRef: ElementRef;
@@ -299,7 +299,15 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 			this.chatThread.messages.splice(oldMsgIdx, 1);
 	}
 
-	MH = new vm.ModelHelpers();
+	openWindow(url: string | SafeUrl) {
+		if (typeof url == 'string')
+			window.open(url);
+		else if (typeof url == 'object') {
+			window.open((<any>url).changingThisBreaksApplicationSecurity);
+		}
+	}
+
+	MH = new ModelHelpers();
 	ngOnInit() {
 		this.settings = UtilitiesService.settings;
 		if (this.settings && this.settings.stompConfig) {
@@ -374,4 +382,14 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 			this._sendMessageDelegate = (a, b) => this.simulator.sendMessage(a, b);
 		}
 	}
+}
+
+export class ModelHelpers {
+	Direction = vm.Direction;
+	MessageStatus = vm.MessageStatus;
+	MessageType = models.MessageType;
+	MessageContentType = models.MessageContentType;
+	MediaType = models.MediaType;
+	InputType = models.InputType;
+	StompConnectionStatus = StompConnectionStatus;
 }
