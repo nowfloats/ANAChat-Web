@@ -344,12 +344,19 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 									"val": ""
 								}
 							}
-						}
+						},
+						"events": [
+							{
+								"type": models.EventType.SET_SESSION_DATA,
+								"data": JSON.stringify(UtilitiesService.settings.appConfig.initVerbs)
+							}
+						]
 					});
 					let msg = new vm.ChatMessageVM(firstMsg, vm.Direction.Outgoing, UtilitiesService.uuidv4()); //Pseudo, not actually added to thread. 
 					this._sendMessageDelegate(new models.ANAChatMessage({
 						meta: UtilitiesService.getReplyMeta(firstMsg.meta),
-						data: firstMsg.data
+						data: firstMsg.data,
+						events: firstMsg.events
 					}), msg);
 				} else {
 					//Retrying all pending messages in the chat thread.

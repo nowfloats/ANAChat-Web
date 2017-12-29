@@ -7,6 +7,9 @@ export interface ThirdPartyConfig {
 export interface AppConfig {
 	fileUploadEndpoint: string;
 	apiEndpoint: string;
+	initVerbs: {
+		[key: string]: string
+	};
 }
 
 export interface BrandingConfig {

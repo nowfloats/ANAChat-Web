@@ -33,7 +33,7 @@
 		getAttr: (script, attr) => {
 			return (script.getAttribute('ana-' + attr) || script.getAttribute('data-' + attr));
 		},
-		main: (givenCustomerId) => {
+		main: (givenCustomerId, initVerbs) => {
 			let script = base.scriptEle();
 			let showBranding = base.getAttr(script, "show-branding") || false;
 			let fullpage = base.getAttr(script, "fullpage") || false;
@@ -87,7 +87,8 @@
 			};
 			let appConfig = {
 				fileUploadEndpoint: fileUploadUrl,
-				apiEndpoint: apiEndpoint
+				apiEndpoint: apiEndpoint,
+				initVerbs: initVerbs
 			};
 			let thirdPartyConfig = {
 				googleMapsKey: base.getAttr(script, "gmaps-key")

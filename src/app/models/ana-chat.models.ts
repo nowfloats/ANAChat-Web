@@ -13,6 +13,11 @@ export interface ANAMeta {
 	responseTo: string;
 }
 
+export interface ANAEvent {
+	type: EventType,
+	data: any
+}
+
 export enum InputType {
 	LOCATION = 7, //Click, Complex
 	DATE = 5, //Click, Complex
@@ -25,6 +30,10 @@ export enum InputType {
 	EMAIL = 2,
 	NUMERIC = 1,
 	TEXT = 0,
+}
+
+export enum EventType {
+	SET_SESSION_DATA = 21
 }
 
 export enum SenderType {
@@ -262,10 +271,12 @@ export class ANAChatMessage implements IANAChatMessage {
 		this.raw = rawMessage;
 		this.meta = this.raw.meta as ANAMeta;
 		this.data = this.raw.data as ANAMessageData;
+		this.events = this.raw.events as ANAEvent[];
 	}
 	private raw: any;
 	meta: ANAMeta;
 	data: ANAMessageData;
+	events: ANAEvent[] = [];
 
 	simpleData() {
 		return this.data as SimpleMessageData;
@@ -280,7 +291,8 @@ export class ANAChatMessage implements IANAChatMessage {
 	extract() {
 		return {
 			meta: this.meta,
-			data: this.data
+			data: this.data,
+			events: this.events
 		}
 	}
 }
