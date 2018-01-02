@@ -41,25 +41,37 @@ Replace all the placeholders in the below code with the onces noted above, copy 
 <script type="text/javascript" id="ana-web-chat-script"
 
 src="http://<web-plugin.ana-chat-server.com>/assets/embed/ana-web-chat-plugin.js" 
-data-endpoint="http://<ana-chat-server.com>:1205/wscustomers/chatcustomers-websocket"
-data-businessid="chat-bot-1"
-data-primary-bg="#8cc83c"
+ana-endpoint="http://<ana-chat-server.com>:1205/wscustomers/chatcustomers-websocket"
+ana-businessid="chat-bot-1"
+ana-primary-bg="#8cc83c"
 
-data-logo-url="<Your chat bot logo url>"
-data-agent-name="<Chat bot name>"
-data-agent-desc="<A small description>"
+ana-logo-url="<Your chat bot logo url>"
+ana-agent-name="<Chat bot name>"
+ana-agent-desc="<A small description>"
 
-data-iframe-src="http://<web-plugin.ana-chat-server.com>/"
-data-api-endpoint="http://<ana-chat-server.com>/"
-data-gmaps-key="<Your Google Maps API Key>"
+ana-iframe-src="http://<web-plugin.ana-chat-server.com>/"
+ana-api-endpoint="http://<ana-chat-server.com>/"
+ana-gmaps-key="<Your Google Maps API Key>"
 
-data-primary-fg="white"
-data-secondary-bg="black"
-data-frame-height="70vh"
-data-frame-width="360px"
+ana-primary-fg="white"
+ana-secondary-bg="black"
+ana-frame-height="70vh"
+ana-frame-width="360px"
 
-data-fullpage="true"
+ana-fullpage="true"
 ></script>
+```
+
+**Manual Initialization**
+
+By default, the script will be initialized automatically. If you want to pass your own userId and any variables during the initialization, **you need to add** ```ana-manual-init="true"``` to the script tag and add the below snippet with the information you need. 
+```
+<script>
+Ana(<user-id>, {
+    "<variable1>":"<value1>",
+    "<variable2>":"<value2>"
+});
+</script>
 ```
 
 **Note:**

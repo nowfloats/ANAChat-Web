@@ -508,7 +508,9 @@
 	let script = base.scriptEle();
 	let manualInit = base.getAttr(script, "manual-init");
 	if (manualInit == 'true') {
-		window.Ana = base.main;
+		window.Ana = (customerId, initVariables) => {
+			base.main(customerId, initVariables);
+		}
 	} else {
 		base.main();
 	}
