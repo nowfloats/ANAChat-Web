@@ -1,5 +1,3 @@
-<h2 md-dialog-title>{{ComplexType[params.Type]}}</h2>
-
 <md-dialog-content>
   <div [ngSwitch]="params.Type">
     <ng-container *ngSwitchCase="ComplexType.Date">
@@ -63,5 +61,5 @@
   </div>
 </md-dialog-content>
 <md-dialog-actions align="center">
-  <button md-raised-button color="primary" [disabled]="!isValid()" md-button class="complex-input-btn-done" (click)="dialogClose()">Done</button>
+  <button md-raised-button color="primary" [disabled]="!isValid()" md-button class="complex-input-btn-done" (click)="dialogClose()">Submit</button>
 </md-dialog-actions>

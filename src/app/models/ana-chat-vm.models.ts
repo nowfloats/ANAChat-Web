@@ -374,7 +374,7 @@ export class ChatInputVM {
 					if ((<models.ListInputContent>this.clickInput.content).multiple) 
 						return 'Choose';
 					else
-						return 'Choose an item';
+						return 'Choose an option';
 				}
 				return 'Choose ' + models.InputType[this.clickInput.content.inputType].toLowerCase();
 			} catch (e) {
