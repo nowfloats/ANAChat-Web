@@ -41,7 +41,7 @@
 			let stompEndpoint = base.getAttr(script, "endpoint");
 			let businessId = base.getAttr(script, "businessid");
 			let apiEndpoint = base.getAttr(script, "api-endpoint");
-			let htmlMessages = base.getAttr(script, "html-messages") || true;
+			let htmlMessages = (base.getAttr(script, "html-messages") === 'true' ? true : false)
 			let flowId = base.getAttr(script, "flowid");
 			let fileUploadUrl = "";
 
