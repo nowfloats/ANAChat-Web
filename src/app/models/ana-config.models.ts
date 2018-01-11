@@ -10,6 +10,7 @@ export interface AppConfig {
 	initVerbs: {
 		[key: string]: string
 	};
+	htmlMessages: boolean;
 }
 
 export interface BrandingConfig {

@@ -41,6 +41,8 @@
 			let stompEndpoint = base.getAttr(script, "endpoint");
 			let businessId = base.getAttr(script, "businessid");
 			let apiEndpoint = base.getAttr(script, "api-endpoint");
+			let htmlMessages = base.getAttr(script, "html-messages") || true;
+			let flowId = base.getAttr(script, "flowid");
 			let fileUploadUrl = "";
 
 			if (!apiEndpoint) {
@@ -72,6 +74,7 @@
 				endpoint: stompEndpoint,
 				customerId: customerId,
 				businessId: businessId,
+				flowId: flowId,
 				debug: base.getAttr(script, "debug") || false
 			};
 			let brandingConfig = {
@@ -88,7 +91,8 @@
 			let appConfig = {
 				fileUploadEndpoint: fileUploadUrl,
 				apiEndpoint: apiEndpoint,
-				initVerbs: initVerbs
+				initVerbs: initVerbs,
+				htmlMessages: htmlMessages
 			};
 			let thirdPartyConfig = {
 				googleMapsKey: base.getAttr(script, "gmaps-key")
