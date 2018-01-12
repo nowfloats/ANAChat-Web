@@ -174,6 +174,7 @@ export interface StompConfig {
 	endpoint: string;
 	customerId: string;
 	businessId: string;
+	flowId: string;
 	debug: boolean;
 }
 

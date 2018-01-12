@@ -327,6 +327,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 								"medium": 3
 							},
 							"senderType": models.SenderType.USER,
+							"flowId": this.stompService.config.flowId,
 							"timestamp": new Date().getTime(),
 						},
 						"data": {

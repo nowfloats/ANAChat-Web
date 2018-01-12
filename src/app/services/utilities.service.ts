@@ -49,6 +49,7 @@ export class UtilitiesService {
 			sender: srcMeta.recipient,
 			senderType: SenderType.USER,
 			sessionId: srcMeta.sessionId,
+			flowId: srcMeta.flowId,
 			timestamp: new Date().getTime()
 		};
 		return replyMeta;

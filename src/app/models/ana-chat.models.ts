@@ -10,6 +10,7 @@ export interface ANAMeta {
 	senderType: SenderType;
 	timestamp: number;
 	sessionId: string;
+	flowId: string;
 	responseTo: string;
 }
 
