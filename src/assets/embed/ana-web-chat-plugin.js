@@ -41,6 +41,7 @@
 			let stompEndpoint = base.getAttr(script, "endpoint");
 			let businessId = base.getAttr(script, "businessid");
 			let apiEndpoint = base.getAttr(script, "api-endpoint");
+			let autoOpen = base.getAttr(script, "auto-open");
 			let htmlMessages = (base.getAttr(script, "html-messages") === 'true' ? true : false)
 			let flowId = base.getAttr(script, "flowid");
 			let fileUploadUrl = "";
@@ -505,8 +506,16 @@
 			document.body.appendChild(divEle);
 
 			let scriptEle = document.createElement('script')
-			scriptEle.innerHTML = bodyScript
+			scriptEle.innerHTML = bodyScript;
 			document.body.appendChild(scriptEle);
+
+			var maxBtn = document.getElementById('ana-max-btn');
+			autoOpen = parseInt(autoOpen);
+			if (maxBtn && autoOpen > 0 && !fullpage) {
+				setTimeout(() => {
+					maxBtn.click();
+				}, autoOpen * 1000);
+			}
 		}
 	}
 	let script = base.scriptEle();
