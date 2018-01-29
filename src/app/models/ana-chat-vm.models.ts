@@ -338,6 +338,8 @@ export class ChatInputVM {
 			senderType: models.SenderType.USER,
 			sessionId: srcMeta ? srcMeta.sessionId : '',
 			flowId: srcMeta.flowId,
+			currentFlowId: srcMeta.currentFlowId,
+			prevFlowId: srcMeta.prevFlowId,
 			timestamp: srcMeta ? srcMeta.timestamp : new Date().getTime()
 		};
 		let input = new ChatInputItemVM(new models.ANAChatMessage({
