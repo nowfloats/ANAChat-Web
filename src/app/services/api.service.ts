@@ -21,7 +21,7 @@ export class APIService {
 			this.apiEndpoint += "/";
 		if (!this.fileUploadEndpoint)
 			this.fileUploadEndpoint = this.apiEndpoint + "files";
-		this.chatHistoryEndpoint = this.apiEndpoint + "chatdata/messages?userId={userId}&businessId={businessId}&size={size}&page=0";
+		this.chatHistoryEndpoint = this.apiEndpoint + "chatdata/messages?userId={userId}&businessId={businessId}&flowId={flowId}&size={size}&page=0&ofCurrentSession=true";
 	}
 
 	uploadFile(file: File) {
@@ -34,7 +34,8 @@ export class APIService {
 	fetchHistory(oldestMsgTimestamp: number, size: number = 20) {
 		let businessId = UtilitiesService.settings.stompConfig.businessId;
 		let customerId = UtilitiesService.settings.stompConfig.customerId;
-		let api = this.chatHistoryEndpoint.replace('{userId}', customerId).replace('{businessId}', businessId).replace('{size}', size.toString());
+		let flowId = UtilitiesService.settings.stompConfig.flowId;
+		let api = this.chatHistoryEndpoint.replace('{userId}', customerId).replace('{businessId}', businessId).replace('{size}', size.toString()).replace("{flowId}", flowId);
 		if (oldestMsgTimestamp)
 			api += "&lastMessageTimeStamp=" + oldestMsgTimestamp.toString();
 		return this.http.get(api).map(res => res.json() as ChatHistoryResponse);
