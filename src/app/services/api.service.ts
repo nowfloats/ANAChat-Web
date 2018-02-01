@@ -21,7 +21,7 @@ export class APIService {
 			this.apiEndpoint += "/";
 		if (!this.fileUploadEndpoint)
 			this.fileUploadEndpoint = this.apiEndpoint + "files";
-		this.chatHistoryEndpoint = this.apiEndpoint + "chatdata/messages?userId={userId}&businessId={businessId}&flowId={flowId}&size={size}&page=0&ofCurrentSession=true";
+		this.chatHistoryEndpoint = this.apiEndpoint + "chatdata/messages?userId={userId}&businessId={businessId}&flowId={flowId}&size={size}&page=0&ofCurrentSession={ofCurrentSession}";
 	}
 
 	uploadFile(file: File) {
@@ -35,7 +35,15 @@ export class APIService {
 		let businessId = UtilitiesService.settings.stompConfig.businessId;
 		let customerId = UtilitiesService.settings.stompConfig.customerId;
 		let flowId = UtilitiesService.settings.stompConfig.flowId;
-		let api = this.chatHistoryEndpoint.replace('{userId}', customerId).replace('{businessId}', businessId).replace('{size}', size.toString()).replace("{flowId}", flowId);
+		let currentSessionOnly = UtilitiesService.settings.stompConfig.currentSessionOnly;
+
+		let api = this.chatHistoryEndpoint
+			.replace('{userId}', customerId)
+			.replace('{businessId}', businessId)
+			.replace('{size}', size.toString())
+			.replace('{flowId}', flowId)
+			.replace('{ofCurrentSession}', currentSessionOnly ? 'true' : 'false');
+
 		if (oldestMsgTimestamp)
 			api += "&lastMessageTimeStamp=" + oldestMsgTimestamp.toString();
 		return this.http.get(api).map(res => res.json() as ChatHistoryResponse);

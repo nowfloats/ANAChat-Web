@@ -42,7 +42,8 @@
 			let businessId = base.getAttr(script, "businessid");
 			let apiEndpoint = base.getAttr(script, "api-endpoint");
 			let autoOpen = base.getAttr(script, "auto-open");
-			let htmlMessages = (base.getAttr(script, "html-messages") === 'true' ? true : false)
+			let htmlMessages = (base.getAttr(script, "html-messages") === 'true' ? true : false);
+			let currentSessionOnly = (base.getAttr(script, "current-session-only") === 'false' ? false : true);
 			let flowId = base.getAttr(script, "flowid");
 			let fileUploadUrl = "";
 
@@ -76,6 +77,7 @@
 				customerId: customerId,
 				businessId: businessId,
 				flowId: flowId,
+				currentSessionOnly: currentSessionOnly,
 				debug: base.getAttr(script, "debug") || false
 			};
 			let brandingConfig = {
