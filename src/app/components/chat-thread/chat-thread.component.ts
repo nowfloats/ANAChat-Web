@@ -311,7 +311,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 
 	getStarted(clearThread: boolean, askConfirmation: boolean) {
 		if (askConfirmation) {
-			this.infoDialog.confirm("Restart the chat?", "Restarting the chat will clear current chat messages. Are you sure?", (ok) => {
+			this.infoDialog.confirm("Start a fresh chat?", "Restarting the chat will clear current chat messages. Are you sure?", (ok) => {
 				if (ok) {
 					this.getStarted(true, false);
 				}
