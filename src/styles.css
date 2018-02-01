@@ -26,3 +26,11 @@ label {
 .carousel-item-button .mat-button-focus-overlay {
     border-radius: 0 0 10px 10px !important;
 }
+
+[hidden] {
+    display: none !important;
+}
+
+.cdk-overlay-dark-backdrop {
+    border-radius: 10px;
+}

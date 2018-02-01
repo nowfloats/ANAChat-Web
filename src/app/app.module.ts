@@ -31,11 +31,14 @@ import { ComplexInputComponent } from './components/complex-input/complex-input.
 import { GoogleMapsConfig } from './models/google-maps-config.model';
 import { MatCSSService } from './services/mat-css.service';
 import { ChainDelayService } from './services/chain-delay.service';
+import { InfoDialogComponent } from './components/info-dialog/info-dialog.component';
+import { InfoDialogService } from './services/info-dialog.service';
 @NgModule({
 	declarations: [
 		AppComponent,
 		ChatThreadComponent,
-		ComplexInputComponent
+		ComplexInputComponent,
+		InfoDialogComponent 
 	],
 	imports: [
 		BrowserModule,
@@ -66,11 +69,13 @@ import { ChainDelayService } from './services/chain-delay.service';
 		MatCSSService,
 		ChainDelayService,
 		SimulatorService,
+		InfoDialogService,
 		{ provide: LAZY_MAPS_API_CONFIG, useClass: GoogleMapsConfig }
 	],
 	bootstrap: [AppComponent],
 	entryComponents: [
-		ComplexInputComponent
+		ComplexInputComponent,
+		InfoDialogComponent
 	],
 	schemas: [NO_ERRORS_SCHEMA]
 })

@@ -10,6 +10,7 @@ import { APIService } from '../../services/api.service';
 import { UtilitiesService, Config } from '../../services/utilities.service';
 import { ChainDelayService } from '../../services/chain-delay.service';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { InfoDialogService } from '../../services/info-dialog.service';
 
 @Component({
 	selector: 'app-chat-thread',
@@ -29,6 +30,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 		private dialog: MdDialog,
 		private simulator: SimulatorService,
 		private sanitizer: DomSanitizer,
+		private infoDialog: InfoDialogService,
 		private chainDelayService: ChainDelayService) {
 
 		this.chatThread = new vm.ChatThreadVM(this.sanitizer);
@@ -307,6 +309,66 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 		}
 	}
 
+	getStarted(clearThread: boolean, askConfirmation: boolean) {
+		if (askConfirmation) {
+			this.infoDialog.confirm("Restart the chat?", "Restarting the chat will clear current chat messages. Are you sure?", (ok) => {
+				if (ok) {
+					this.getStarted(true, false);
+				}
+			}, "Yes", "No");
+			return;
+		}
+		if (clearThread) {
+			this.chatThread.messages = [];
+			this.chatInput.resetInputs();
+		}
+		let firstMsg = new models.ANAChatMessage({
+			"meta": {
+				"sender": {
+					"id": this.stompService.config.businessId,
+					"medium": 3
+				},
+				"recipient": {
+					"id": this.stompService.config.customerId,
+					"medium": 3
+				},
+				"senderType": models.SenderType.USER,
+				"flowId": this.stompService.config.flowId,
+				"prevFlowId": this.stompService.config.flowId,
+				"currentFlowId": this.stompService.config.flowId,
+				"timestamp": new Date().getTime(),
+			},
+			"data": {
+				"type": 2,
+				"content": {
+					"inputType": models.InputType.OPTIONS,
+					"mandatory": 1,
+					"options": [
+						{
+							"title": "Get Started",
+							"value": "GetStarted"
+						}
+					],
+					"input": {
+						"val": ""
+					}
+				}
+			},
+			"events": [
+				{
+					"type": models.EventType.SET_SESSION_DATA,
+					"data": JSON.stringify(UtilitiesService.settings.appConfig.initVerbs)
+				}
+			]
+		});
+		let msg = new vm.ChatMessageVM(firstMsg, vm.Direction.Outgoing, UtilitiesService.uuidv4()); //Pseudo, not actually added to thread. 
+		this._sendMessageDelegate(new models.ANAChatMessage({
+			meta: UtilitiesService.getReplyMeta(firstMsg.meta),
+			data: firstMsg.data,
+			events: firstMsg.events
+		}), msg);
+	}
+
 	MH = new ModelHelpers();
 	ngOnInit() {
 		this.settings = UtilitiesService.settings;
@@ -316,51 +378,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 			this.stompService.handleMessageReceived = this._handleMessageReceivedDelegate;
 			this.stompService.handleConnect = () => {
 				if (this.chatThread.messages.length <= 0) {
-					let firstMsg = new models.ANAChatMessage({
-						"meta": {
-							"sender": {
-								"id": this.stompService.config.businessId,
-								"medium": 3
-							},
-							"recipient": {
-								"id": this.stompService.config.customerId,
-								"medium": 3
-							},
-							"senderType": models.SenderType.USER,
-							"flowId": this.stompService.config.flowId,
-							"prevFlowId": this.stompService.config.flowId,
-							"currentFlowId": this.stompService.config.flowId,
-							"timestamp": new Date().getTime(),
-						},
-						"data": {
-							"type": 2,
-							"content": {
-								"inputType": models.InputType.OPTIONS,
-								"mandatory": 1,
-								"options": [
-									{
-										"title": "Get Started",
-										"value": "GetStarted"
-									}
-								],
-								"input": {
-									"val": ""
-								}
-							}
-						},
-						"events": [
-							{
-								"type": models.EventType.SET_SESSION_DATA,
-								"data": JSON.stringify(UtilitiesService.settings.appConfig.initVerbs)
-							}
-						]
-					});
-					let msg = new vm.ChatMessageVM(firstMsg, vm.Direction.Outgoing, UtilitiesService.uuidv4()); //Pseudo, not actually added to thread. 
-					this._sendMessageDelegate(new models.ANAChatMessage({
-						meta: UtilitiesService.getReplyMeta(firstMsg.meta),
-						data: firstMsg.data,
-						events: firstMsg.events
-					}), msg);
+					this.getStarted(false, false);
 				} else {
 					//Retrying all pending messages in the chat thread.
 					this.removeConsecutiveErrorsMessage();

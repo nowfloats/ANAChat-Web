@@ -11,6 +11,7 @@ export interface AppConfig {
 		[key: string]: string
 	};
 	htmlMessages: boolean;
+	allowFlowReset: boolean;
 }
 
 export interface BrandingConfig {
