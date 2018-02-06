@@ -37,13 +37,14 @@ You need few more things listed below
 
 Replace all the placeholders in the below code with the onces noted above, copy and paste it in your website's html file just above the &lt;/body&gt; (body's closing tag)
 
-```
+```html
 <script type="text/javascript" id="ana-web-chat-script"
 
 src="http://<web-plugin.ana-chat-server.com>/assets/embed/ana-web-chat-plugin.js" 
 ana-endpoint="http://<ana-chat-server.com>:1205/wscustomers/chatcustomers-websocket"
 ana-businessid="chat-bot-1"
 ana-primary-bg="#8cc83c"
+ana-flowid="chat-project-id-1"
 
 ana-logo-url="<Your chat bot logo url>"
 ana-agent-name="<Chat bot name>"
@@ -62,6 +63,26 @@ ana-fullpage="true"
 ></script>
 ```
 
+**Advanced options**
+
+```
+No of seconds to wait and open the chat window automatically:
+ana-auto-open="30" 
+
+Show or hide chat reset button:
+ana-allow-chat-reset="true" or "false"
+
+Enable HTML formatting in messages:
+ana-html-messages="true" or "false"
+
+Load only current chat session in history:
+ana-current-session-only="false" or "true"
+
+Show or hide 'Powered by Ana':
+ana-show-branding="true" or "false"
+
+```
+
 **Manual Initialization**
 
 By default, the script will be initialized automatically. If you want to pass your own userId and any variables during the initialization, **you need to add** ```ana-manual-init="true"``` to the script tag and add the below snippet with the information you need. 
@@ -73,9 +94,6 @@ Ana(<user-id>, {
 });
 </script>
 ```
-
-**Note:**
-You also have other customisation options like chat window width (data-frame-width), height (data-frame-height), primary foreground color (data-primary-fg) etc. You can change them as per your needs.
 
 ## License
 
