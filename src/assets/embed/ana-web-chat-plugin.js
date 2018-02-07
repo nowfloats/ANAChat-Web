@@ -490,13 +490,7 @@
 				document.getElementById('ana-max-btn').addEventListener('click', minMaxClickHandler);
 			})();
 				`;
-
-			let fonts = document.createElement('link');
-			fonts.href = 'https://fonts.googleapis.com/css?family=Open+Sans';
-			fonts.type = "text/css";
-			fonts.rel = "stylesheet";
-			document.head.appendChild(fonts);
-
+			
 			let headStyle = document.createElement('style');
 			headStyle.innerHTML = styleInHead;
 			document.head.appendChild(headStyle);
