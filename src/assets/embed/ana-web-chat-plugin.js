@@ -350,6 +350,7 @@
     .ana-link {
 		color: #3c3c3c;
 		text-decoration: none;
+		font-family: sans-serif;
 	}
     .ana-link:hover {
 		text-decoration: underline;
