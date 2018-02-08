@@ -376,7 +376,16 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 				this.removeConsecutiveErrorsMessage();
 				this.chatThread.addTextIncoming(Config.consecutiveErrorsMessageText, Config.consecutiveErrorsMessageAckId);
 			};
-			this.loadHistory(() => this.stompService.connect());
+			this.loadHistory(() => {
+				try {
+					if (window.parent && window.parent.postMessage) {
+						window.parent.postMessage({
+							type: "LOADED"
+						}, "*");
+					}
+				} catch (e) { }
+				this.stompService.connect()
+			});
 		}
 
 		if (this.settings.simulatorMode) {
