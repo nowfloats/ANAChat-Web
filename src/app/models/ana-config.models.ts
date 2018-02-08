@@ -12,6 +12,7 @@ export interface AppConfig {
 	};
 	htmlMessages: boolean;
 	allowFlowReset: boolean;
+	fullpage: boolean;
 }
 
 export interface BrandingConfig {

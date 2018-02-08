@@ -319,6 +319,9 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 			return;
 		}
 		if (clearThread) {
+			this.fetchingHistory = true;
+			setTimeout(() => this.fetchingHistory = false, 1000);
+
 			this.chatThread.messages = [];
 			this.chatInput.resetInputs();
 		}
@@ -334,7 +337,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 				},
 				"senderType": models.SenderType.USER,
 				"flowId": this.stompService.config.flowId,
-				"prevFlowId": this.stompService.config.flowId,
+				"previousFlowId": this.stompService.config.flowId,
 				"currentFlowId": this.stompService.config.flowId,
 				"timestamp": new Date().getTime(),
 			},
@@ -397,7 +400,16 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 				this.removeConsecutiveErrorsMessage();
 				this.chatThread.addTextIncoming(Config.consecutiveErrorsMessageText, Config.consecutiveErrorsMessageAckId);
 			};
-			this.loadHistory(() => this.stompService.connect());
+			this.loadHistory(() => {
+				try {
+					if (window.parent && window.parent.postMessage) {
+						window.parent.postMessage({
+							type: "LOADED"
+						}, "*");
+					}
+				} catch (e) { }
+				this.stompService.connect()
+			});
 		}
 
 		if (this.settings.simulatorMode) {

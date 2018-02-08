@@ -22,12 +22,9 @@
             </div>
             <div class="ana-actions">
                 <div class="ana-action" title="Start a fresh chat" (click)="getStarted(true, true)" [hidden]="!settings.appConfig.allowFlowReset">
-                    <!--<svg xmlns="http://www.w3.org/2000/svg">
-        <path d="M12.905 1.706C9.513-.993 4.572-.428 1.874 2.964a7.846 7.846 0 0 0 .638 10.447 4.466 4.466 0 0 1-.875.985c-.383.328-.401.911-.073 1.294a.973.973 0 0 0 .656.31h.128c.875 0 2.151-.182 3.136-.711 4.084 1.422 8.551-.748 9.973-4.832 1.094-3.19.073-6.691-2.552-8.751zm-2.516 6.746H8.565v1.823H7.471V8.452H5.648V7.358h1.823V5.534h1.094v1.824h1.824v1.094z" />
-    </svg>-->
-                    <!--<svg xmlns="http://www.w3.org/2000/svg"><path d="M1.817 6.687c.514 0 .979-.309 1.178-.783A5.434 5.434 0 0 1 8 2.567c1.241 0 2.38.426 3.291 1.131l-.715.111a.558.558 0 0 0-.143 1.06l3.932 1.77a.559.559 0 0 0 .787-.507l.02-4.333a.558.558 0 0 0-1.022-.312l-.542.815A7.972 7.972 0 0 0 8 0C4.69 0 1.843 2.022.63 4.895a1.29 1.29 0 0 0 1.187 1.792zM15.258 9.89a1.29 1.29 0 0 0-1.075-.577c-.514 0-.979.309-1.178.783A5.434 5.434 0 0 1 8 13.433a5.359 5.359 0 0 1-3.291-1.131l.715-.11a.558.558 0 0 0 .143-1.061L1.635 9.362a.559.559 0 0 0-.787.506l-.02 4.333a.557.557 0 0 0 1.022.312l.542-.815A7.972 7.972 0 0 0 8 16c3.31 0 6.157-2.022 7.37-4.895a1.289 1.289 0 0 0-.112-1.215z" /></svg>-->
-                    <!--<svg xmlns="http://www.w3.org/2000/svg"><path d="M8 0a7.945 7.945 0 0 0-5.656 2.345C-.57 5.26-.78 9.916 1.815 13.072c-.358.734-.78 1.223-1.26 1.457a.749.749 0 0 0-.408.78c.05.326.298.577.623.627.177.027.368.044.566.044.982 0 2.014-.338 2.875-.931A8.006 8.006 0 0 0 7.999 16c2.138 0 4.144-.83 5.655-2.342a7.947 7.947 0 0 0 2.342-5.655c0-2.134-.83-4.147-2.342-5.658A7.944 7.944 0 0 0 8 0zm.029 3.626a4.386 4.386 0 0 1 3.411 1.738c.095-.277.057-.608.256-.845.249-.333.844-.154.905.245-.04.594-.228 1.167-.337 1.751-.014.283-.142.621-.449.692-.456.003-.901-.157-1.343-.241-.298-.096-.642-.066-.915-.242-.337-.2-.254-.757.09-.903.296-.091.607.037.898.096-.643-.82-1.708-1.287-2.735-1.241-1.468.033-2.817 1.196-3.098 2.635-.102.3.005.635-.134.925-.169.386-.798.338-.94-.044-.086-.507.01-1.03.162-1.515.52-1.757 2.27-3.055 4.1-3.05h.129zm3.832 3.735a.53.53 0 0 1 .445.284c.105.408.052.844-.03 1.254-.292 1.505-1.457 2.784-2.909 3.257-1.686.58-3.692-.032-4.78-1.441-.109.268-.086.594-.292.82-.264.324-.855.117-.896-.286.07-.592.287-1.156.426-1.733.026-.285.179-.62.493-.67.452.029.882.204 1.32.311.295.111.637.1.9.288.327.218.216.769-.136.897-.293.076-.593-.065-.872-.135.754.882 2.006 1.276 3.124 1.054 1.495-.263 2.677-1.698 2.664-3.21-.076-.315.167-.694.506-.69a.47.47 0 0 1 .037 0z" /></svg>-->
-                    <svg xmlns="http://www.w3.org/2000/svg"><path d="M8 0C3.61 0 0 3.61 0 8c0 4.39 3.61 8 8 8 4.39 0 8-3.61 8-8 0-4.39-3.61-8-8-8zm3.746 8.741H8.741v3.005c0 .43-.331.742-.741.742a.741.741 0 0 1-.741-.742V8.741H4.254A.729.729 0 0 1 3.512 8c0-.41.312-.741.742-.741h3.005V4.254c0-.43.331-.742.741-.742s.741.332.741.742v3.005h3.005c.43 0 .742.331.742.741s-.332.741-.742.741z" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.279 15.279">
+                        <path d="M7.599 1.918v-1.8c0-.1.125-.154.209-.091l3.7 2.719a.114.114 0 0 1 0 .184l-3.7 2.719c-.084.062-.21.006-.21-.09V3.76A4.843 4.843 0 0 0 2.847 8.93c.159 2.4 2.115 4.347 4.515 4.5a4.849 4.849 0 0 0 5.094-4.06.92.92 0 0 1 .912-.771c.56 0 .994.497.907 1.047-.544 3.428-3.703 6-7.366 5.59-3.062-.343-5.522-2.793-5.869-5.856C.58 5.374 3.692 1.961 7.6 1.918z" />
+                    </svg>
                 </div>
             </div>
             <div class="chat-history-loading" [hidden]="!fetchingHistory">
@@ -57,7 +54,7 @@
                                     <ng-container *ngSwitchCase="MH.MessageContentType.Media">
                                         <div [ngSwitch]="msg.messageData.content.media.type">
                                             <ng-container *ngSwitchCase="MH.MediaType.IMAGE">
-                                                <img [src]="msg.messageData.content.media.url" class="chat-media" (click)="openWindow(msg.messageData.content.media.url)" [class.clickable]="msg.messageData.content.media.url"/>
+                                                <img [src]="msg.messageData.content.media.url" class="chat-media" (click)="openWindow(msg.messageData.content.media.url)" [class.clickable]="msg.messageData.content.media.url" />
                                                 <span class="chat-bottom-overlay">
                                                     <img src="assets/svg/picture.svg" />&nbsp; {{msg.messageData.content.text||'Photo'}}
                                                 </span>
@@ -176,7 +173,7 @@
             <div class="chat-input text" *ngIf="chatInput.textInput">
                 <input [type]="chatInput.htmlInputType(chatInput.textInput)" [readonly]="chatInput.textInput.disabled" (keypress)="chatInput.handleKeyPress(chatInput.textInput, $event)" name="chat-text" id="chat-text" class="chat-text-input" [(ngModel)]="chatInput.textInput.content.input.val" [placeholder]="((chatInput.textInput.disabled? 'Waiting for response':(chatInput.textInput.content.textInputAttr?(chatInput.textInput.content.textInputAttr.placeHolder?chatInput.textInput.content.textInputAttr.placeHolder:''):'')))" [maxlength]="(chatInput.textInput.content.textInputAttr?chatInput.textInput.content.textInputAttr.maxLength:'')" (focus)="chatTextInputOnFocus()" />
                 <button type="button" class="btn-icon" [disabled]="!chatInput.textInput.content.input.val" (click)="chatInput.handleClick(chatInput.textInput)">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path class="send-button" d="M23.878.983a.359.359 0 0 0-.388-.056L.208 11.745a.359.359 0 0 0-.007.647l6.589 3.234c.12.06.265.046.372-.035l6.407-4.788-5.03 5.173a.359.359 0 0 0-.1.278l.5 6.52a.359.359 0 0 0 .63.208l3.497-4.053 4.323 2.066a.358.358 0 0 0 .497-.217L23.983 1.36a.359.359 0 0 0-.105-.377z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path class="send-button" d="M23.878.983a.359.359 0 0 0-.388-.056L.208 11.745a.359.359 0 0 0-.007.647l6.589 3.234c.12.06.265.046.372-.035l6.407-4.788-5.03 5.173a.359.359 0 0 0-.1.278l.5 6.52a.359.359 0 0 0 .63.208l3.497-4.053 4.323 2.066a.358.358 0 0 0 .497-.217L23.983 1.36a.359.359 0 0 0-.105-.377z" /></svg>
                 </button>
             </div>
         </div>

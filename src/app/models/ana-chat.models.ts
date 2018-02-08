@@ -11,7 +11,7 @@ export interface ANAMeta {
 	timestamp: number;
 	sessionId: string;
 	flowId: string;
-	prevFlowId: string;
+	previousFlowId: string;
 	currentFlowId: string;
 	responseTo: string;
 }

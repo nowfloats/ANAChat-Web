@@ -125,6 +125,9 @@ path.send-button{
   background-color: ${accent || '#8cc83c'};
 }
 
+.ana-actions {
+  margin-right: ${UtilitiesService.settings.appConfig.fullpage ? "-5px" : "20px"};
+}
 `;
 		this.matCSS.loadCustomMatTheme(accent, customStyle, appCSS);
 	}
