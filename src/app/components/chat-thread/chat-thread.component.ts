@@ -34,7 +34,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 		private chainDelayService: ChainDelayService) {
 
 		this.chatThread = new vm.ChatThreadVM(this.sanitizer);
-		this.chatInput = new vm.ChatInputVM(this.dialog, this.chatThread, this.apiService, this, this.sanitizer);
+		this.chatInput = new vm.ChatInputVM(this.dialog, this.chatThread, this.apiService, this.stompService, this, this.sanitizer);
 	}
 	@ViewChild("inputContainer")
 	inputContainerRef: ElementRef;
@@ -389,12 +389,24 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 					pendingMsgs.forEach(x => x.retrySending());
 				}
 			};
-			this.stompService.handleAck = (messageAckId: string) => {
-				let msg = this.chatThread.messages.find(x => x.messageAckId == messageAckId);
-				if (msg) {
-					msg.status = vm.MessageStatus.ReceivedAtServer;
-					msg.clearTimeoutTimer();
+			this.stompService.handleAck = (messageAckId: string, deliveredAck?: boolean) => {
+				if (deliveredAck) {
+					//For deliveredAck, msgAckId is the msg.meta.id
+					let msg = this.chatThread.messages.find(x => x.meta.id == messageAckId); 
+					if (msg) {
+						msg.status = vm.MessageStatus.DelieveredToTarget;
+						msg.clearTimeoutTimer();
+					}
+				} else {
+					let msg = this.chatThread.messages.find(x => x.messageAckId == messageAckId);
+					if (msg) {
+						msg.status = vm.MessageStatus.ReceivedAtServer;
+						msg.clearTimeoutTimer();
+					}
 				}
+			};
+			this.stompService.handleTyping = () => {
+				this.chatThread.setTyping();
 			};
 			this.stompService.handleConsecutiveErrorsState = () => {
 				this.removeConsecutiveErrorsMessage();

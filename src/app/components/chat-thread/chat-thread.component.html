@@ -94,7 +94,12 @@
                                     <span *ngIf="msg.isToday()">
                                         {{msg.time | date:'shortTime'}}
                                     </span>
-                                    <svg class="ana-sent-tick" *ngIf="msg.direction==MH.Direction.Outgoing && msg.status==MH.MessageStatus.ReceivedAtServer" xmlns="http://www.w3.org/2000/svg" width="10" height="10"><path d="M9.887 1.475a.385.385 0 0 0-.544 0L3.11 7.709.657 5.257a.385.385 0 1 0-.544.544l2.724 2.724c.15.15.394.15.544 0L9.887 2.02a.385.385 0 0 0 0-.544z" /></svg>
+                                    <svg class="ana-sent-tick" *ngIf="msg.direction==MH.Direction.Outgoing && msg.status==MH.MessageStatus.ReceivedAtServer" xmlns="http://www.w3.org/2000/svg" width="10" height="10">
+                                        <path d="M9.887 1.475a.385.385 0 0 0-.544 0L3.11 7.709.657 5.257a.385.385 0 1 0-.544.544l2.724 2.724c.15.15.394.15.544 0L9.887 2.02a.385.385 0 0 0 0-.544z" />
+                                    </svg>
+                                    <svg class="ana-delivered-tick" *ngIf="msg.direction==MH.Direction.Outgoing && msg.status==MH.MessageStatus.DelieveredToTarget" xmlns="http://www.w3.org/2000/svg" width="10" height="10">
+                                        <path d="M7.554 2.725l-.601-.6-2.704 2.703.6.601 2.705-2.704zm1.802-.6L4.85 6.673 3.047 4.87l-.6.601L4.85 7.876 10 2.726l-.644-.602zM0 5.471l2.403 2.404.601-.601L.601 4.87 0 5.472z" />
+                                    </svg>
                                 </span>
                                 <span class="chat-stub"></span>
                             </div>

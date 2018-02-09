@@ -290,6 +290,10 @@ bg white
     transform: translateY(1px);
 }
 
+.ana-delivered-tick {
+    transform: translateY(1px);
+}
+
 .carousel-wrapper {
     position: relative;
     margin: 0 -20px;

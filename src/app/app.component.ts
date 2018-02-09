@@ -82,6 +82,14 @@ export class AppComponent {
 .ana-sent-tick{
   color: ${accent || '#8cc83c'};
 }
+
+.ana-delivered-tick path{
+	fill: ${accent || '#8cc83c'};
+}
+.ana-delivered-tick{
+  color: ${accent || '#8cc83c'};
+}
+
 .chat-message-item.outgoing {
   border-right-color: ${secondary || 'black'};
 }

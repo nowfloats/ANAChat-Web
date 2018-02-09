@@ -4,7 +4,7 @@ import * as SockJS from 'sockjs-client';
 import * as StompJS from 'stompjs';
 
 import { ChatMessageVM, MessageStatus } from '../models/ana-chat-vm.models';
-import { ANAChatMessage } from '../models/ana-chat.models';
+import { ANAChatMessage, ANAMeta, EventType } from '../models/ana-chat.models';
 import { UtilitiesService, Config } from '../services/utilities.service';
 
 @Injectable()
@@ -98,7 +98,17 @@ export class StompService {
 		}, this.stompHeaders);
 		this.stompHeaders['id'] = UtilitiesService.uuidv4();
 		this.client.subscribe('/queue/events/user/' + custId, (message) => {
-			this.onAck(message.headers['tid']);
+			let msg = new ANAChatMessage(JSON.parse(message.body));
+			if (msg.events) {
+				for (var i = 0; i < msg.events.length; i++) {
+					let event = msg.events[i];
+					if (event.type == EventType.ACK) {
+						this.onAck(message.headers['tid']);
+					} else if (event.type == EventType.TYPING) {
+						this.onTyping();
+					}
+				}
+			}
 		}, this.stompHeaders);
 	}
 
@@ -129,16 +139,35 @@ export class StompService {
 		}, t);
 	}
 
-	private onAck = (msgAckId: string) => {
-		this.debug("Ack Msg Id: " + msgAckId);
+	private onAck = (msgAckId: string, delivered?: boolean) => {
+		this.debug(`${delivered ? "DeliveredAck:" : "SentAck:"}` + msgAckId);
 		if (this.handleAck)
-			this.handleAck(msgAckId);
+			this.handleAck(msgAckId, delivered);
+	};
+
+	private onTyping = () => {
+		this.debug("Typing... ");
+		if (this.handleTyping)
+			this.handleTyping();
 	};
 
 	private msgsIds: string[] = [];
 	private onMessage = (messageBody: any) => {
+		let anaMsg = new ANAChatMessage(messageBody);
+		if (!anaMsg.data || Object.keys(anaMsg.data).length <= 0) {
+			this.sendMessageReceivedAck(anaMsg.meta);
+		}
+		if (anaMsg.events && anaMsg.events.length > 0) {
+			for (var i = 0; i < anaMsg.events.length; i++) {
+				let event = anaMsg.events[i];
+				if (event.type == EventType.ACK) {
+					this.onAck(anaMsg.meta.id, true);
+				} else if (event.type == EventType.TYPING) {
+					this.onTyping();
+				}
+			}
+		}
 		if (this.handleMessageReceived) {
-			let anaMsg = new ANAChatMessage(messageBody);
 			if (this.msgsIds.indexOf(anaMsg.meta.id) == -1) { //handle message only if it is not already handled
 				this.msgsIds.push(anaMsg.meta.id);
 				this.handleMessageReceived(anaMsg);
@@ -163,9 +192,38 @@ export class StompService {
 		_sendMessage();
 	}
 
+	typingBusy = false;
+	sendTypingMessage(meta: ANAMeta) {
+		if (this.typingBusy) {
+			return;
+		}
+		this.typingBusy = true;
+		setTimeout(() => this.typingBusy = false, 1000);
+		let msg = new ANAChatMessage({
+			meta: UtilitiesService.getReplyMeta(meta),
+			events: [{
+				type: EventType.TYPING
+			}]
+		});
+		let headers = this.stompHeaders;
+		this.client.send(`/app/message`, headers, JSON.stringify(msg));
+	}
+
+	sendMessageReceivedAck(meta: ANAMeta) {
+		let msg = new ANAChatMessage({
+			meta: UtilitiesService.getReplyMeta(meta, true),
+			events: [{
+				type: EventType.ACK
+			}]
+		});
+		let headers = this.stompHeaders;
+		this.client.send(`/app/message`, headers, JSON.stringify(msg));
+	}
+
 	handleConnect: () => void;
 	handleMessageReceived: (message: ANAChatMessage) => any;
-	handleAck: (messageAckId: string) => any;
+	handleAck: (messageAckId: string, delivered?: boolean) => any;
+	handleTyping: () => void;
 	handleConsecutiveErrorsState: () => void;
 }
 

@@ -3,7 +3,7 @@ import { MdDialog } from '@angular/material';
 
 import * as models from './ana-chat.models';
 import { UtilitiesService, Config } from '../services/utilities.service';
-import { StompConnectionStatus } from '../services/stomp.service';
+import { StompConnectionStatus, StompService } from '../services/stomp.service';
 import { APIService } from '../services/api.service';
 import { ComplexInputComponent, ComplexType, ComplexInputParams } from '../components/complex-input/complex-input.component';
 import { ChatThreadComponent } from '../components/chat-thread/chat-thread.component';
@@ -14,7 +14,7 @@ export enum Direction {
 	Outgoing
 }
 export enum MessageStatus {
-	None, SentToServer, ReceivedAtServer, SentTimeout
+	None, SentToServer, ReceivedAtServer, SentTimeout, DelieveredToTarget
 }
 export class ChatMessageVM {
 	direction: Direction;
@@ -27,7 +27,7 @@ export class ChatMessageVM {
 	private timeoutTimer: NodeJS.Timer;
 	startTimeoutTimer() {
 		this.timeoutTimer = setTimeout(() => {
-			if (this.status != MessageStatus.ReceivedAtServer)
+			if (this.status == MessageStatus.SentToServer)
 				this.status = MessageStatus.SentTimeout;
 		}, 2000);
 	}
@@ -123,7 +123,7 @@ export class ChatThreadVM {
 		return msg;
 	}
 	typingTimerId: NodeJS.Timer;
-	setTyping() {
+	setTyping(autohide?: boolean) {
 		if (this.typingTimerId)
 			clearTimeout(this.typingTimerId);
 		this.removeTyping();
@@ -140,6 +140,11 @@ export class ChatThreadVM {
 		}), Direction.Incoming, '');
 
 		this.addMessage(msg);
+		if (autohide) {
+			this.typingTimerId = setTimeout(() => {
+				this.removeTyping();
+			}, 1000);
+		}
 	}
 
 	removeTyping() {
@@ -223,6 +228,7 @@ export class ChatInputVM {
 		public dialog: MdDialog,
 		public chatThread: ChatThreadVM,
 		public apiService: APIService,
+		public stomp: StompService,
 		public chatThreadComponent: ChatThreadComponent,
 		public sanitizer: DomSanitizer) { }
 
@@ -613,11 +619,15 @@ export class ChatInputVM {
 
 	handleKeyPress(inputVM: ChatInputItemVM, event: KeyboardEvent) {
 		if (event.keyCode == 13) //Enter key
+		{
 			if (this.inputCategory(inputVM) == models.InputCategory.Text) {
 				if (inputVM.textInputContent().input.val)
 					this.handleClick(inputVM);
 			} else
 				this.handleClick(inputVM);
+		} else {
+			this.stomp.sendTypingMessage(inputVM.meta);
+		}
 	}
 	handleBtnOptionClick(inputVM: ChatInputItemVM, optionVal: string) {
 		if (inputVM.content.inputType == models.InputType.OPTIONS) {

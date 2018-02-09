@@ -41,9 +41,9 @@ export class UtilitiesService {
 		return hours + ":" + minutes + " " + am_pm;
 	}
 
-	static getReplyMeta(srcMeta: ANAMeta) {
+	static getReplyMeta(srcMeta: ANAMeta, copyId?: boolean) {
 		let replyMeta: ANAMeta = {
-			id: this.uuidv4(),
+			id: copyId ? srcMeta.id : this.uuidv4(),
 			recipient: srcMeta.sender,
 			responseTo: srcMeta.id,
 			sender: srcMeta.recipient,

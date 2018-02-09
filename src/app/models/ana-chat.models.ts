@@ -36,7 +36,9 @@ export enum InputType {
 }
 
 export enum EventType {
-	SET_SESSION_DATA = 21
+	SET_SESSION_DATA = 21,
+	TYPING = 11,
+	ACK = 13
 }
 
 export enum SenderType {
