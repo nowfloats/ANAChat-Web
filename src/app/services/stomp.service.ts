@@ -206,7 +206,7 @@ export class StompService {
 			}]
 		});
 		let headers = this.stompHeaders;
-		this.client.send(`/app/message`, headers, JSON.stringify(msg));
+		this.client.send(`/app/message`, headers, JSON.stringify(msg.extract()));
 	}
 
 	sendMessageReceivedAck(meta: ANAMeta) {
@@ -217,7 +217,7 @@ export class StompService {
 			}]
 		});
 		let headers = this.stompHeaders;
-		this.client.send(`/app/message`, headers, JSON.stringify(msg));
+		this.client.send(`/app/message`, headers, JSON.stringify(msg.extract()));
 	}
 
 	handleConnect: () => void;
