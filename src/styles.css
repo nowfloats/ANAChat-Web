@@ -22,7 +22,7 @@ label {
     background-color: white !important;
 }
 
-.carousel-item-button .mat-button-ripple.mat-ripple,
-.carousel-item-button .mat-button-focus-overlay {
+.carousel-item-button:last-child .mat-button-ripple.mat-ripple,
+.carousel-item-button:last-child .mat-button-focus-overlay {
     border-radius: 0 0 10px 10px !important;
 }
