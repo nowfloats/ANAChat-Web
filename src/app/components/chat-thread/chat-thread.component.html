@@ -110,8 +110,8 @@
                             <div #carouselContainer class="carousel-container scrollbar" [ngClass]="msg.meta.id">
                                 <div *ngFor="let carItem of msg.messageData.content.items" class="carousel-item-container">
                                     <div class="carousel-item">
-                                        <div class="carousel-item-content">
-                                            <div *ngIf="carItem.media">
+                                        <div class="carousel-item-content" [class.no-media]="!carouselItemHasMedia(carItem)">
+                                            <div *ngIf="carouselItemHasMedia(carItem)">
                                                 <div [ngSwitch]="carItem.media.type" class="carousel-item-media">
                                                     <ng-container *ngSwitchCase="MH.MediaType.IMAGE">
                                                         <img [src]="carItem.media.url" />

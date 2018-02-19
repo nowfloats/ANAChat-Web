@@ -434,6 +434,10 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 			this._sendMessageDelegate = (a, b) => this.simulator.sendMessage(a, b);
 		}
 	}
+
+	carouselItemHasMedia(carItem: models.CarouselItem) {
+		return carItem.media && (carItem.media.type != null || carItem.media.type != undefined) && carItem.media.url;
+	}
 }
 
 export class ModelHelpers {

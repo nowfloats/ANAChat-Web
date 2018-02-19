@@ -396,6 +396,10 @@ bg white
     flex-grow: 1;
 }
 
+    .carousel-item-content.no-media {
+        padding: 10px 20px;
+    }
+
 .carousel-item-container {
     margin-bottom: 5px;
     padding: 3px; /*For carousel item shadow to be visible*/
