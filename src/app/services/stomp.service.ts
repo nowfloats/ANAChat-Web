@@ -93,7 +93,9 @@ export class StompService {
 
 		//Header: Id should be different for different subscription
 		this.stompHeaders['id'] = UtilitiesService.uuidv4();
-		this.client.subscribe('/topic/chat/customer/' + custId + "/business/" + this.config.businessId + "/flow/" + this.config.flowId, (message) => {
+
+		let channel = (this.config.flowId ? '/topic/chat/customer/' + custId + "/business/" + this.config.businessId + "/flow/" + this.config.flowId : '/topic/chat/customer/' + custId + "/business/" + this.config.businessId);
+		this.client.subscribe(channel, (message) => {
 			this.onMessage(JSON.parse(message.body));
 		}, this.stompHeaders);
 		this.stompHeaders['id'] = UtilitiesService.uuidv4();
