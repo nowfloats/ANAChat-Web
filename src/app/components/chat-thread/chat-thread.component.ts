@@ -67,15 +67,26 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 	setMin(min: boolean) {
 		this.isMin = min;
 	}
+	carItemWidth: number = 245;
 	scrollCarousel(carId: string, direction: string) {
 		if (this.carouselContainers && this.carouselContainers.length > 0) {
 			let carousels = this.carouselContainers.map(x => x.nativeElement as HTMLDivElement).filter(x => x.classList.contains(carId));
 			if (carousels) {
 				let car = carousels[0];
-				if (direction == 'right')
-					car.scrollBy({ behavior: 'smooth', left: 245 }); //The 'left' value should be the width + margin of a single carousel item set in the CSS
-				else if (direction == 'left')
-					car.scrollBy({ behavior: 'smooth', left: -245 });
+				if (direction == 'right') {
+					if (car.scrollBy) {
+						car.scrollBy({ behavior: 'smooth', left: this.carItemWidth }); //The 'left' value should be the width + margin of a single carousel item set in the CSS
+					} else {
+						car.scrollLeft += this.carItemWidth;
+					}
+				}
+				else if (direction == 'left') {
+					if (car.scrollBy) {
+						car.scrollBy({ behavior: 'smooth', left: -this.carItemWidth });
+					} else {
+						car.scrollLeft -= this.carItemWidth;
+					}
+				}
 			}
 		}
 	}
@@ -392,7 +403,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 			this.stompService.handleAck = (messageAckId: string, deliveredAck?: boolean) => {
 				if (deliveredAck) {
 					//For deliveredAck, msgAckId is the msg.meta.id
-					let msg = this.chatThread.messages.find(x => x.meta.id == messageAckId); 
+					let msg = this.chatThread.messages.find(x => x.meta.id == messageAckId);
 					if (msg) {
 						msg.status = vm.MessageStatus.DelieveredToTarget;
 						msg.clearTimeoutTimer();
