@@ -77,7 +77,7 @@
 				endpoint: stompEndpoint,
 				customerId: customerId,
 				businessId: businessId,
-				flowId: flowId,
+				flowId: flowId || businessId,
 				currentSessionOnly: currentSessionOnly,
 				debug: base.getAttr(script, "debug") || false
 			};
