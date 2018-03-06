@@ -1,6 +1,8 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, ViewChildren } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
+import * as hammerjs from 'hammerjs';
+
 import * as models from '../../models/ana-chat.models';
 import * as config from '../../models/ana-config.models';
 import * as vm from '../../models/ana-chat-vm.models';
@@ -11,6 +13,7 @@ import { UtilitiesService, Config } from '../../services/utilities.service';
 import { ChainDelayService } from '../../services/chain-delay.service';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { InfoDialogService } from '../../services/info-dialog.service';
+//import { ImageViewerComponent } from 'ngx-image-viewer/src/app/image-viewer/image-viewer.component';
 
 @Component({
 	selector: 'app-chat-thread',
@@ -324,6 +327,72 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 
 	viewImage(url: string | SafeUrl) {
 		this.fullScreenImage = url;
+		this.setupImageViewerGestures();
+	}
+
+	closeImageViewer() {
+		this.fullScreenImage = null;
+		if (this.hammerManager) {
+			this.hammerManager.destroy();
+			delete this.hammerManager;
+		}
+	}
+
+	//@ViewChild('imageViewer')
+	//imageViewer: ImageViewerComponent;
+
+	zoomLevel: number = 1;
+	panLeft: number = 0;
+	panTop: number = 0;
+	hammerManager: HammerManager;
+	setupImageViewerGestures() {
+
+		if (this.hammerManager) {
+			this.hammerManager.destroy();
+			delete this.hammerManager;
+		}
+
+		let ele = document.querySelector("div.image-viewer-container") as HTMLDivElement;
+		//let ele = this.imageViewer;
+		debugger;
+		if (ele) {
+			this.hammerManager = new hammerjs.Manager(<any>ele, {
+				recognizers: [
+					[Hammer.Tap, { enable: true }],
+					[Hammer.Pinch, { enable: true, direction: Hammer.DIRECTION_ALL }],
+					[Hammer.Pan, { direction: Hammer.DIRECTION_ALL, enable: true }],
+				]
+			});
+			this.hammerManager.on('tap', (e) => {
+				console.log("tap");
+				console.log(e);
+			});
+			this.hammerManager.on("pinch", (e) => {
+				console.log("pinch" + e.scale);
+				this.zoomLevel += e.scale;
+				ele.style.transform = this.imageViewerTransform();
+			});
+			this.hammerManager.on("panleft", (e) => {
+				this.panLeft -= e.distance;
+				ele.style.transform = this.imageViewerTransform();
+			});
+			this.hammerManager.on("panright", (e) => {
+				this.panLeft += e.distance;
+				ele.style.transform = this.imageViewerTransform();
+			});
+			this.hammerManager.on("panup", (e) => {
+				this.panTop += e.distance;
+				ele.style.transform = this.imageViewerTransform();
+			});
+			this.hammerManager.on("pandown", (e) => {
+				this.panTop -= e.distance;
+				ele.style.transform = this.imageViewerTransform();
+			});
+		}
+	}
+
+	imageViewerTransform() {
+		return `transform: translate(${this.panLeft}px, ${this.panTop}px) rotate(0deg) scale(${this.zoomLevel});`;
 	}
 
 	getStarted(clearThread: boolean, askConfirmation: boolean) {
