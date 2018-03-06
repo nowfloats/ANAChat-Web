@@ -1,43 +1,43 @@
-<md-dialog-content>
+<mat-dialog-content>
   <div [ngSwitch]="params.Type">
     <ng-container *ngSwitchCase="ComplexType.Date">
-      <md-form-field>
-        <input mdInput [mdDatepicker]="datePicker" placeholder="Choose a date" [(ngModel)]="choosenDate">
-        <md-datepicker-toggle mdSuffix [for]="datePicker" class="ana-color-accent"></md-datepicker-toggle>
-        <md-datepicker touchUi="true" #datePicker></md-datepicker>
-      </md-form-field>
+      <mat-form-field>
+        <input matInput [matDatepicker]="datePicker" placeholder="Choose a date" [(ngModel)]="choosenDate">
+        <mat-datepicker-toggle matSuffix [for]="datePicker" class="ana-color-accent"></mat-datepicker-toggle>
+        <mat-datepicker touchUi="true" #datePicker></mat-datepicker>
+      </mat-form-field>
     </ng-container>
 
     <ng-container *ngSwitchCase="ComplexType.Time">
-      <md-form-field>
-        <input mdInput type="time" placeholder="Choose a time" [(ngModel)]="choosenTime">
-      </md-form-field>
+      <mat-form-field>
+        <input matInput type="time" placeholder="Choose a time" [(ngModel)]="choosenTime">
+      </mat-form-field>
     </ng-container>
     <ng-container *ngSwitchCase="ComplexType.Address">
 
-      <md-form-field>
-        <input mdInput type="text" placeholder="Street Address" [(ngModel)]="givenAddress.line1" name="addressLine1">
-      </md-form-field>
+      <mat-form-field>
+        <input matInput type="text" placeholder="Street Address" [(ngModel)]="givenAddress.line1" name="addressLine1">
+      </mat-form-field>
 
-      <md-form-field>
-        <input mdInput type="text" placeholder="Area" [(ngModel)]="givenAddress.area" name="addressArea">
-      </md-form-field>
+      <mat-form-field>
+        <input matInput type="text" placeholder="Area" [(ngModel)]="givenAddress.area" name="addressArea">
+      </mat-form-field>
 
-      <md-form-field>
-        <input mdInput type="text" placeholder="City" [(ngModel)]="givenAddress.city" name="addressCity">
-      </md-form-field>
+      <mat-form-field>
+        <input matInput type="text" placeholder="City" [(ngModel)]="givenAddress.city" name="addressCity">
+      </mat-form-field>
 
-      <md-form-field>
-        <input mdInput type="text" placeholder="State" [(ngModel)]="givenAddress.state" name="addressState">
-      </md-form-field>
+      <mat-form-field>
+        <input matInput type="text" placeholder="State" [(ngModel)]="givenAddress.state" name="addressState">
+      </mat-form-field>
 
-      <md-form-field>
-        <input mdInput type="text" placeholder="Country" [(ngModel)]="givenAddress.country" name="addressCountry">
-      </md-form-field>
+      <mat-form-field>
+        <input matInput type="text" placeholder="Country" [(ngModel)]="givenAddress.country" name="addressCountry">
+      </mat-form-field>
 
-      <md-form-field>
-        <input mdInput type="text" placeholder="Pin" [(ngModel)]="givenAddress.pin" name="addressPin">
-      </md-form-field>
+      <mat-form-field>
+        <input matInput type="text" placeholder="Pin" [(ngModel)]="givenAddress.pin" name="addressPin">
+      </mat-form-field>
     </ng-container>
     <ng-container *ngSwitchCase="ComplexType.Location">
       <agm-map [latitude]="geoLoc.lat" [longitude]="geoLoc.lng">
@@ -45,21 +45,21 @@
       </agm-map>
     </ng-container>
     <ng-container *ngSwitchCase="ComplexType.List">
-      <md-list *ngIf="listMultiple">
-        <md-list-item *ngFor="let listItem of listValues; let i = index">
-          <md-checkbox [(ngModel)]="listItem.isSelected" name="listItemIsSelected-{{i}}" align="start">{{listItem.text}}</md-checkbox>
-        </md-list-item>
-      </md-list>
-      <md-list *ngIf="!listMultiple">
-        <md-radio-group [(ngModel)]="selectedListItem">
-          <md-list-item *ngFor="let listItem of listValues; let i = index">
-            <md-radio-button name="listItemIsSelected-{{i}}" [value]="listItem" align="start">{{listItem.text}}</md-radio-button>
-          </md-list-item>
-        </md-radio-group>
-      </md-list>
+      <mat-list *ngIf="listMultiple">
+        <mat-list-item *ngFor="let listItem of listValues; let i = index">
+          <mat-checkbox [(ngModel)]="listItem.isSelected" name="listItemIsSelected-{{i}}" align="start">{{listItem.text}}</mat-checkbox>
+        </mat-list-item>
+      </mat-list>
+      <mat-list *ngIf="!listMultiple">
+        <mat-radio-group [(ngModel)]="selectedListItem">
+          <mat-list-item *ngFor="let listItem of listValues; let i = index">
+            <mat-radio-button name="listItemIsSelected-{{i}}" [value]="listItem" align="start">{{listItem.text}}</mat-radio-button>
+          </mat-list-item>
+        </mat-radio-group>
+      </mat-list>
     </ng-container>
   </div>
-</md-dialog-content>
-<md-dialog-actions align="center">
-  <button md-raised-button color="primary" [disabled]="!isValid()" md-button class="complex-input-btn-done" (click)="dialogClose()">Submit</button>
-</md-dialog-actions>
+</mat-dialog-content>
+<mat-dialog-actions align="center">
+  <button mat-raised-button color="primary" [disabled]="!isValid()" mat-button class="complex-input-btn-done" (click)="dialogClose()">Submit</button>
+</mat-dialog-actions>

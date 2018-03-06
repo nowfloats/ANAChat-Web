@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, ViewChildren } from '@angular/core';
-import { MdDialog, MdDialogRef, MD_DIALOG_DATA } from '@angular/material';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import * as models from '../../models/ana-chat.models';
 import * as config from '../../models/ana-config.models';
@@ -27,7 +27,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 	constructor(
 		private stompService: StompService,
 		private apiService: APIService,
-		private dialog: MdDialog,
+		private dialog: MatDialog,
 		private simulator: SimulatorService,
 		private sanitizer: DomSanitizer,
 		private infoDialog: InfoDialogService,
@@ -49,6 +49,8 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 	chatInput: vm.ChatInputVM;
 	settings: config.AppSettings;
 	isMin: boolean = false;
+
+	fullScreenImage: string | SafeUrl;
 
 	connectionStatusMessage() {
 		if (!this.stompService)
@@ -318,6 +320,10 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 		else if (typeof url == 'object') {
 			window.open((<any>url).changingThisBreaksApplicationSecurity);
 		}
+	}
+
+	viewImage(url: string | SafeUrl) {
+		this.fullScreenImage = url;
 	}
 
 	getStarted(clearThread: boolean, askConfirmation: boolean) {

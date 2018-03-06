@@ -5,20 +5,21 @@ import { RouterModule } from '@angular/router';
 import { HttpModule } from '@angular/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
-	MdDialogModule,
-	MdDatepickerModule,
-	MdFormFieldModule,
-	MdNativeDateModule,
-	MdInputModule,
-	MdButtonModule,
-	MdListModule,
-	MdCheckboxModule,
-	MdCardModule,
-	MdRadioModule,
-	MdProgressBarModule
+	MatDialogModule,
+	MatDatepickerModule,
+	MatFormFieldModule,
+	MatNativeDateModule,
+	MatInputModule,
+	MatButtonModule,
+	MatListModule,
+	MatCheckboxModule,
+	MatCardModule,
+	MatRadioModule,
+	MatProgressBarModule
 } from '@angular/material';
 
 import { AgmCoreModule, LAZY_MAPS_API_CONFIG } from '@agm/core';
+import { ImageViewerModule } from 'ngx-image-viewer';
 
 import { AppComponent } from './app.component';
 import { ChatThreadComponent } from './components/chat-thread/chat-thread.component';
@@ -38,29 +39,45 @@ import { InfoDialogService } from './services/info-dialog.service';
 		AppComponent,
 		ChatThreadComponent,
 		ComplexInputComponent,
-		InfoDialogComponent 
+		InfoDialogComponent
 	],
 	imports: [
 		BrowserModule,
 		FormsModule,
 		BrowserAnimationsModule,
-		MdDialogModule,
-		MdDatepickerModule,
-		MdFormFieldModule,
-		MdNativeDateModule,
-		MdInputModule,
-		MdButtonModule,
-		MdListModule,
-		MdCheckboxModule,
-		MdCardModule,
-		MdRadioModule,
-		MdProgressBarModule,
+		MatDialogModule,
+		MatDatepickerModule,
+		MatFormFieldModule,
+		MatNativeDateModule,
+		MatInputModule,
+		MatButtonModule,
+		MatListModule,
+		MatCheckboxModule,
+		MatCardModule,
+		MatRadioModule,
+		MatProgressBarModule,
 		RouterModule.forRoot([
 			{ path: '', component: ChatThreadComponent },
 			{ path: '**', redirectTo: '' }
 		]),
 		HttpModule,
-		AgmCoreModule.forRoot()
+		AgmCoreModule.forRoot(),
+		ImageViewerModule.forRoot({
+			btnClass: 'hidden',
+			zoomFactor: 0.1,
+			containerBackgroundColor: 'rgba(0,0,0,0.8)',
+			wheelZoom: true,
+			allowFullscreen: true,
+			btnIcons: {
+				zoomIn: 'hidden',
+				zoomOut: 'hidden',
+				rotateClockwise: 'hidden',
+				rotateCounterClockwise: 'hidden',
+				next: 'hidden',
+				prev: 'hidden',
+				fullscreen: 'hidden',
+			}
+		}),
 	],
 	providers: [
 		StompService,

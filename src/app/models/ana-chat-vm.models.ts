@@ -1,5 +1,5 @@
 import { ElementRef } from '@angular/core';
-import { MdDialog } from '@angular/material';
+import { MatDialog } from '@angular/material';
 
 import * as models from './ana-chat.models';
 import { UtilitiesService, Config } from '../services/utilities.service';
@@ -225,7 +225,7 @@ export class ChatInputItemVM {
 }
 export class ChatInputVM {
 	constructor(
-		public dialog: MdDialog,
+		public dialog: MatDialog,
 		public chatThread: ChatThreadVM,
 		public apiService: APIService,
 		public stomp: StompService,

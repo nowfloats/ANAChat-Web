@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject, ViewChild, ElementRef, AfterViewInit, EventEmitter } from '@angular/core';
-import { MdDialogRef, MD_DIALOG_DATA, MdDatepicker, MdSelectionList, MdSelectionListOptionEvent } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDatepicker, MatSelectionList } from '@angular/material';
 import { ANADate, ANATime, AddressInput, GeoLoc, ListItem, ANADateRange } from '../../models/ana-chat.models';
 import { UtilitiesService } from '../../services/utilities.service';
 import * as agm from '@agm/core';
@@ -11,8 +11,8 @@ import * as agm from '@agm/core';
 })
 export class ComplexInputComponent implements OnInit, AfterViewInit {
 	constructor(
-		public dialogRef: MdDialogRef<ComplexInputComponent>,
-		@Inject(MD_DIALOG_DATA) public params: ComplexInputParams) { }
+		public dialogRef: MatDialogRef<ComplexInputComponent>,
+		@Inject(MAT_DIALOG_DATA) public params: ComplexInputParams) { }
 
 	ngOnInit() {
 		if (this.params.Type == ComplexType.Location) {
@@ -47,7 +47,7 @@ export class ComplexInputComponent implements OnInit, AfterViewInit {
 	}
 
 	@ViewChild("datePicker")
-	datePicker: MdDatepicker<Date>;
+	datePicker: MatDatepicker<Date>;
 
 	choosenDate: Date;
 	getChoosenANADate(): ANADate {

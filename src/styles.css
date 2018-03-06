@@ -27,10 +27,44 @@ label {
     border-radius: 0 0 10px 10px !important;
 }
 
-[hidden] {
+[hidden], .hidden {
     display: none !important;
 }
 
 .cdk-overlay-dark-backdrop {
     border-radius: 10px;
 }
+
+.image-viewer-container {
+    z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    border: 0;
+}
+
+    .image-viewer-container .img-container {
+        height: 100vh !important;
+        width: 100vw !important;
+    }
+
+        .image-viewer-container .img-container img {
+            transform: translate(0, 50%);
+        }
+
+    .image-viewer-container .btn-close {
+        z-index: 1100;
+        position: fixed;
+        top: 0;
+        right: 0;
+    }
+
+        .image-viewer-container .btn-close svg {
+            width: 16px;
+            height: 16px;
+        }
+
+            .image-viewer-container .btn-close svg path {
+                fill: white;
+            }

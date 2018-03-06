@@ -28,7 +28,7 @@
                 </div>
             </div>
             <div class="chat-history-loading" [hidden]="!fetchingHistory">
-                <md-progress-bar mode="indeterminate" color="primary"></md-progress-bar>
+                <mat-progress-bar mode="indeterminate" color="primary"></mat-progress-bar>
             </div>
         </div>
         <div class="chat-thread scrollbar" #chatThreadView (scroll)="chatThreadOnScroll($event)">
@@ -54,13 +54,13 @@
                                     <ng-container *ngSwitchCase="MH.MessageContentType.Media">
                                         <div [ngSwitch]="msg.messageData.content.media.type">
                                             <ng-container *ngSwitchCase="MH.MediaType.IMAGE">
-                                                <img [src]="msg.messageData.content.media.url" class="chat-media" (click)="openWindow(msg.messageData.content.media.url)" [class.clickable]="msg.messageData.content.media.url" />
+                                                <img [src]="msg.messageData.content.media.url" class="chat-media" (click)="viewImage(msg.messageData.content.media.url)" [class.clickable]="msg.messageData.content.media.url" />
                                                 <span class="chat-bottom-overlay">
                                                     <img src="assets/svg/picture.svg" />&nbsp; {{msg.messageData.content.text||'Photo'}}
                                                 </span>
                                             </ng-container>
                                             <ng-container *ngSwitchCase="MH.MediaType.VIDEO">
-                                                <video controls="controls" class="chat-media" (click)="openWindow(msg.messageData.content.media.url)" [class.clickable]="msg.messageData.content.media.url">
+                                                <video controls="controls" class="chat-media" (click)="viewImage(msg.messageData.content.media.url)" [class.clickable]="msg.messageData.content.media.url">
                                                     <source [src]="msg.messageData.content.media.url" />
                                                 </video>
                                                 <span class="chat-bottom-overlay">
@@ -114,7 +114,7 @@
                                             <div *ngIf="carouselItemHasMedia(carItem)">
                                                 <div [ngSwitch]="carItem.media.type" class="carousel-item-media">
                                                     <ng-container *ngSwitchCase="MH.MediaType.IMAGE">
-                                                        <img [src]="carItem.media.url" />
+                                                        <img [src]="carItem.media.url" (click)="viewImage(carItem.media.url)" [class.clickable]="carItem.media.url" />
                                                     </ng-container>
                                                     <ng-container *ngSwitchCase="MH.MediaType.VIDEO">
                                                         <video controls [src]="carItem.media.url"></video>
@@ -133,7 +133,7 @@
                                         </div>
                                         <div class="carousel-item-button-container">
                                             <div class="carousel-item-button" *ngFor="let carBtn of carItem.options">
-                                                <button md-button (click)="handleCarouselClick(msg, carBtn)" [disabled]="!isLastMessage(msg)">{{carBtn.title}}</button>
+                                                <button mat-button (click)="handleCarouselClick(msg, carBtn)" [disabled]="!isLastMessage(msg)">{{carBtn.title}}</button>
                                             </div>
                                         </div>
                                     </div>
@@ -183,4 +183,12 @@
             </div>
         </div>
     </div>
+</div>
+<div class="image-viewer-container" *ngIf="fullScreenImage">
+    <ngx-image-viewer [src]="[fullScreenImage]"></ngx-image-viewer>
+    <button mat-icon-button (click)="fullScreenImage=null" class="btn-close">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3.748 3.748">
+            <path d="M2.205 1.874L3.68.4A.234.234 0 1 0 3.348.07L1.874 1.543.4.069A.234.234 0 1 0 .07.4l1.473 1.474L.07 3.348a.234.234 0 1 0 .331.331l1.474-1.474L3.348 3.68a.234.234 0 0 0 .331 0 .234.234 0 0 0 0-.331L2.205 1.874z" />
+        </svg>
+    </button>
 </div>
