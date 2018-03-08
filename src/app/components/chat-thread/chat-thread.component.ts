@@ -344,7 +344,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 		this.destroyHammer();
 	}
 
-	hammerManager: hammer.HammerManager;
+	hammerManager: HammerManager;
 	destroyHammer() { //Hela \m/
 		if (this.hammerManager) {
 			this.hammerManager.destroy();
