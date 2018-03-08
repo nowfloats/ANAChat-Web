@@ -2,7 +2,7 @@
     <div class="content">
         <div class="ana-title">
             <div class="ana-logo">
-                <img [src]="settings.brandingConfig.logoUrl" class="ana-full" />
+                <img [src]="settings.brandingConfig.logoUrl" class="ana-full" (click)="settings.brandingConfig.logoClickUrl?openWindow(settings.brandingConfig.logoClickUrl):null" [class.clickable]="settings.brandingConfig.logoClickUrl"/>
             </div>
             <div class="ana-content">
                 <div class="title">{{settings.brandingConfig.agentName}}</div>

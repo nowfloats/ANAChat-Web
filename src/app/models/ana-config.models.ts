@@ -20,6 +20,7 @@ export interface BrandingConfig {
 	primaryForegroundColor: string;
 	secondaryBackgroundColor: string;
 	logoUrl: string;
+	logoClickUrl: string;
 	agentName: string;
 	agentDesc: string;
 	frameHeight: string;

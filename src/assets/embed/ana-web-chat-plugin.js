@@ -41,6 +41,7 @@
 			let stompEndpoint = base.getAttr(script, "endpoint");
 			let businessId = base.getAttr(script, "businessid");
 			let apiEndpoint = base.getAttr(script, "api-endpoint");
+			let logoClickUrl = base.getAttr(script, "logo-action-url");
 			let autoOpen = base.getAttr(script, "auto-open");
 			let allowFlowReset = (base.getAttr(script, "allow-chat-reset") === 'true' ? true : false);
 			let htmlMessages = (base.getAttr(script, "html-messages") === 'true' ? true : false);
@@ -81,6 +82,7 @@
 				currentSessionOnly: currentSessionOnly,
 				debug: base.getAttr(script, "debug") || false
 			};
+
 			let brandingConfig = {
 				primaryBackgroundColor: base.getAttr(script, "primary-bg") || '#8cc83c',
 				primaryForegroundColor: base.getAttr(script, "primary-fg") || 'white',
@@ -90,8 +92,10 @@
 				agentDesc: base.getAttr(script, "agent-desc"),
 				frameHeight: base.getAttr(script, "frame-height") || '500px',
 				frameWidth: base.getAttr(script, "frame-width") || '360px',
-				frameContentWidth: base.getAttr(script, "frame-content-width") || '360px'
+				frameContentWidth: base.getAttr(script, "frame-content-width") || '360px',
+				logoClickUrl: logoClickUrl
 			};
+
 			let appConfig = {
 				fileUploadEndpoint: fileUploadUrl,
 				apiEndpoint: apiEndpoint,
@@ -659,7 +663,7 @@
 				}
 			})();
 				`;
-			
+
 			let headStyle = document.createElement('style');
 			headStyle.innerHTML = styleInHead;
 			document.head.appendChild(headStyle);
