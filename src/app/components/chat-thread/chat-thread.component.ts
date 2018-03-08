@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, ViewChildren } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
-import * as hammerjs from 'hammerjs';
+import * as hammer from 'hammerjs';
 
 import * as models from '../../models/ana-chat.models';
 import * as config from '../../models/ana-config.models';
@@ -114,7 +114,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 
 	isLastInMessageGroup(msg: vm.ChatMessageVM) {
 		let msgsOnly = this.chatThread.messages.filter(x => x.getMessageContentType() != models.MessageContentType.Typing);
-		var index = msgsOnly.indexOf(msg);
+		let index = msgsOnly.indexOf(msg);
 		if (index != -1) {
 			if (index >= (msgsOnly.length - 1))
 				return true;
@@ -125,7 +125,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 	}
 	isLastMessage(msg: vm.ChatMessageVM) {
 		let msgsOnly = this.chatThread.messages.filter(x => x.getMessageContentType() != models.MessageContentType.Typing);
-		var index = msgsOnly.indexOf(msg);
+		let index = msgsOnly.indexOf(msg);
 		return index == msgsOnly.length - 1;
 	}
 	handleCarouselClick(chatMessage: vm.ChatMessageVM, carOption: models.CarouselOption) {
@@ -184,7 +184,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 		if (!this.chatThread.chatThreadView) return;
 		if (!this.settings || this.settings.simulatorMode) return;
 
-		var currentScrollTop = this.chatThread.chatThreadView.scrollTop;
+		let currentScrollTop = this.chatThread.chatThreadView.scrollTop;
 		if (currentScrollTop < this.lastScrollTop) {
 			if (this.fetchingHistory)
 				return;
@@ -222,7 +222,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 		this.apiService.fetchHistory(oldMsgTimestamp).subscribe(resp => {
 			try {
 				let chatMsgs = resp.content.map(x => new models.ANAChatMessage(x));
-				for (var i = 0; i < chatMsgs.length; i++) {
+				for (let i = 0; i < chatMsgs.length; i++) {
 					let chatMsg = chatMsgs[i];
 					let direction = chatMsg.meta.recipient.id == this.stompService.config.businessId ? vm.Direction.Outgoing : vm.Direction.Incoming;
 					switch (chatMsg.data.type) {
@@ -338,13 +338,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 		}
 	}
 
-	//@ViewChild('imageViewer')
-	//imageViewer: ImageViewerComponent;
-
-	zoomLevel: number = 1;
-	panLeft: number = 0;
-	panTop: number = 0;
-	hammerManager: HammerManager;
+	hammerManager: hammer.HammerManager;
 	setupImageViewerGestures() {
 
 		if (this.hammerManager) {
@@ -352,47 +346,59 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 			delete this.hammerManager;
 		}
 
-		let ele = document.querySelector("div.image-viewer-container") as HTMLDivElement;
-		//let ele = this.imageViewer;
-		debugger;
-		if (ele) {
-			this.hammerManager = new hammerjs.Manager(<any>ele, {
-				recognizers: [
-					[Hammer.Tap, { enable: true }],
-					[Hammer.Pinch, { enable: true, direction: Hammer.DIRECTION_ALL }],
-					[Hammer.Pan, { direction: Hammer.DIRECTION_ALL, enable: true }],
-				]
+		let imgContainer = document.querySelector("div.img-container") as HTMLDivElement;
+		let image = document.querySelector("div.img-container>img") as HTMLImageElement;
+		if (imgContainer && image) {
+			image.alt = "";
+			this.hammerManager = new hammer.Manager(image);
+
+			let pinch = new hammer.Pinch();
+			let pan = new hammer.Pan();
+
+			pinch.recognizeWith(pan);
+
+			this.hammerManager.add([pinch, pan]);
+
+			let adjustScale = 1;
+			let adjustDeltaX = 0;
+			let adjustDeltaY = 0;
+
+			let currentScale = null;
+			let currentDeltaX = null;
+			let currentDeltaY = null;
+
+			// Prevent long press saving on mobiles.
+			imgContainer.addEventListener('touchstart', function (e) {
+				console.log("touch start");
+				e.preventDefault()
 			});
-			this.hammerManager.on('tap', (e) => {
-				console.log("tap");
-				console.log(e);
+
+			// Handles pinch and pan events/transforming at the same time;
+			this.hammerManager.on("pinch pan", function (ev) {
+				console.log("Start");
+				console.log(ev);
+				let transforms = [];
+
+				// Adjusting the current pinch/pan event properties using the previous ones set when they finished touching
+				currentScale = adjustScale * ev.scale;
+				currentDeltaX = adjustDeltaX + (ev.deltaX / currentScale);
+				currentDeltaY = adjustDeltaY + (ev.deltaY / currentScale);
+
+				// Concatinating and applying parameters.
+				transforms.push(`scale(${currentScale})`);
+				transforms.push(`translate(${currentDeltaX}px,${currentDeltaY}px)`);
+				imgContainer.style.transform = transforms.join(' ');
 			});
-			this.hammerManager.on("pinch", (e) => {
-				console.log("pinch" + e.scale);
-				this.zoomLevel += e.scale;
-				ele.style.transform = this.imageViewerTransform();
-			});
-			this.hammerManager.on("panleft", (e) => {
-				this.panLeft -= e.distance;
-				ele.style.transform = this.imageViewerTransform();
-			});
-			this.hammerManager.on("panright", (e) => {
-				this.panLeft += e.distance;
-				ele.style.transform = this.imageViewerTransform();
-			});
-			this.hammerManager.on("panup", (e) => {
-				this.panTop += e.distance;
-				ele.style.transform = this.imageViewerTransform();
-			});
-			this.hammerManager.on("pandown", (e) => {
-				this.panTop -= e.distance;
-				ele.style.transform = this.imageViewerTransform();
+
+			this.hammerManager.on("panend pinchend", function (ev) {
+				console.log("End");
+				console.log(ev);
+				// Saving the final transforms for adjustment next time the user interacts.
+				adjustScale = currentScale;
+				adjustDeltaX = currentDeltaX;
+				adjustDeltaY = currentDeltaY;
 			});
 		}
-	}
-
-	imageViewerTransform() {
-		return `transform: translate(${this.panLeft}px, ${this.panTop}px) rotate(0deg) scale(${this.zoomLevel});`;
 	}
 
 	getStarted(clearThread: boolean, askConfirmation: boolean) {

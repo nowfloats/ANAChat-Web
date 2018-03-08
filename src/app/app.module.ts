@@ -65,7 +65,7 @@ import { InfoDialogService } from './services/info-dialog.service';
 		ImageViewerModule.forRoot({
 			btnClass: 'hidden',
 			zoomFactor: 0.1,
-			containerBackgroundColor: 'rgba(0,0,0,0.8)',
+			containerBackgroundColor: 'rgba(0,0,0,0)',
 			wheelZoom: true,
 			allowFullscreen: true,
 			btnIcons: {
