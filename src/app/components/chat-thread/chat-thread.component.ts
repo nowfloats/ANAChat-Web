@@ -327,78 +327,82 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 
 	viewImage(url: string | SafeUrl) {
 		this.fullScreenImage = url;
-		this.setupImageViewerGestures();
+
+		let imgContainer = document.querySelector("div.img-container") as HTMLDivElement;
+		let image = document.querySelector("div.img-container>img") as HTMLImageElement;
+
+		if (imgContainer && image) {
+			image.alt = '';
+			image.style.transform = '';
+			imgContainer.style.transform = '';
+			this.setupImageViewerGestures(imgContainer, image);
+		}
 	}
 
 	closeImageViewer() {
 		this.fullScreenImage = null;
+		this.destroyHammer();
+	}
+
+	hammerManager: hammer.HammerManager;
+	destroyHammer() { //Hela \m/
 		if (this.hammerManager) {
 			this.hammerManager.destroy();
 			delete this.hammerManager;
 		}
 	}
 
-	hammerManager: hammer.HammerManager;
-	setupImageViewerGestures() {
+	setupImageViewerGestures(imgContainer: HTMLDivElement, image: HTMLImageElement) {
+		this.destroyHammer();
 
-		if (this.hammerManager) {
-			this.hammerManager.destroy();
-			delete this.hammerManager;
+		if (!UtilitiesService.isMobile()) {
+			//Ignore touch handlers if mouse is detected
+			return;
 		}
 
-		let imgContainer = document.querySelector("div.img-container") as HTMLDivElement;
-		let image = document.querySelector("div.img-container>img") as HTMLImageElement;
-		if (imgContainer && image) {
-			image.alt = "";
-			this.hammerManager = new hammer.Manager(image);
+		this.hammerManager = new hammer.Manager(image);
 
-			let pinch = new hammer.Pinch();
-			let pan = new hammer.Pan();
+		let pinch = new hammer.Pinch();
+		let pan = new hammer.Pan();
 
-			pinch.recognizeWith(pan);
+		pinch.recognizeWith(pan);
 
-			this.hammerManager.add([pinch, pan]);
+		this.hammerManager.add([pinch, pan]);
 
-			let adjustScale = 1;
-			let adjustDeltaX = 0;
-			let adjustDeltaY = 0;
+		let adjustScale = 1;
+		let adjustDeltaX = 0;
+		let adjustDeltaY = 0;
 
-			let currentScale = null;
-			let currentDeltaX = null;
-			let currentDeltaY = null;
+		let currentScale = null;
+		let currentDeltaX = null;
+		let currentDeltaY = null;
 
-			// Prevent long press saving on mobiles.
-			imgContainer.addEventListener('touchstart', function (e) {
-				console.log("touch start");
-				e.preventDefault()
-			});
+		// Prevent long press saving on mobiles.
+		imgContainer.ontouchstart = function (e) {
+			e.preventDefault()
+		};
 
-			// Handles pinch and pan events/transforming at the same time;
-			this.hammerManager.on("pinch pan", function (ev) {
-				console.log("Start");
-				console.log(ev);
-				let transforms = [];
+		// Handles pinch and pan events/transforming at the same time;
+		this.hammerManager.on("pinch pan", function (ev) {
+			let transforms = [];
 
-				// Adjusting the current pinch/pan event properties using the previous ones set when they finished touching
-				currentScale = adjustScale * ev.scale;
-				currentDeltaX = adjustDeltaX + (ev.deltaX / currentScale);
-				currentDeltaY = adjustDeltaY + (ev.deltaY / currentScale);
+			// Adjusting the current pinch/pan event properties using the previous ones set when they finished touching
+			currentScale = adjustScale * ev.scale;
+			currentDeltaX = adjustDeltaX + (ev.deltaX / currentScale);
+			currentDeltaY = adjustDeltaY + (ev.deltaY / currentScale);
 
-				// Concatinating and applying parameters.
-				transforms.push(`scale(${currentScale})`);
-				transforms.push(`translate(${currentDeltaX}px,${currentDeltaY}px)`);
-				imgContainer.style.transform = transforms.join(' ');
-			});
+			// Concatinating and applying parameters.
+			transforms.push(`scale(${currentScale})`);
+			transforms.push(`translate(${currentDeltaX}px,${currentDeltaY}px)`);
+			imgContainer.style.transform = transforms.join(' ');
+		});
 
-			this.hammerManager.on("panend pinchend", function (ev) {
-				console.log("End");
-				console.log(ev);
-				// Saving the final transforms for adjustment next time the user interacts.
-				adjustScale = currentScale;
-				adjustDeltaX = currentDeltaX;
-				adjustDeltaY = currentDeltaY;
-			});
-		}
+		this.hammerManager.on("panend pinchend", function (ev) {
+			// Saving the final transforms for adjustment next time the user interacts.
+			adjustScale = currentScale;
+			adjustDeltaX = currentDeltaX;
+			adjustDeltaY = currentDeltaY;
+		});
 	}
 
 	getStarted(clearThread: boolean, askConfirmation: boolean) {
