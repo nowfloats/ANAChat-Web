@@ -43,6 +43,7 @@ label {
     right: 0;
     background-color: rgba(0,0,0,0.8);
     border: 0;
+    border-radius: 10px;
 }
 
     .image-viewer-container .img-container {
@@ -68,5 +69,43 @@ label {
         }
 
             .image-viewer-container .btn-close svg path {
+                fill: white;
+            }
+
+.video-viewer-container {
+    z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0,0,0,0.8);
+    border: 0;
+    border-radius: 10px;
+}
+
+    .video-viewer-container .video-container {
+        height: 100vh !important;
+        width: 100vw !important;
+    }
+
+        .video-viewer-container .video-container > video {
+            width: 100%;
+            transform: translate(0, 50%);
+        }
+
+    .video-viewer-container .btn-close {
+        z-index: 1100;
+        position: fixed;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+        .video-viewer-container .btn-close svg {
+            width: 16px;
+            height: 16px;
+        }
+
+            .video-viewer-container .btn-close svg path {
                 fill: white;
             }

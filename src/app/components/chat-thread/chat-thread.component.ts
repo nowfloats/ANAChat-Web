@@ -54,6 +54,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 	isMin: boolean = false;
 
 	fullScreenImage: string | SafeUrl;
+	fullScreenVideo: string | SafeUrl;
 
 	connectionStatusMessage() {
 		if (!this.stompService)
@@ -339,9 +340,17 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 		}
 	}
 
+	viewVideo(url: string | SafeUrl) {
+		this.fullScreenVideo = url;
+	}
+
 	closeImageViewer() {
 		this.fullScreenImage = null;
 		this.destroyHammer();
+	}
+
+	closeVideoViewer() {
+		this.fullScreenVideo = null;
 	}
 
 	hammerManager: HammerManager;

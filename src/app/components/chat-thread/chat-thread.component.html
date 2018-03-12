@@ -2,7 +2,7 @@
     <div class="content">
         <div class="ana-title">
             <div class="ana-logo">
-                <img [src]="settings.brandingConfig.logoUrl" class="ana-full" (click)="settings.brandingConfig.logoClickUrl?openWindow(settings.brandingConfig.logoClickUrl):null" [class.clickable]="settings.brandingConfig.logoClickUrl"/>
+                <img [src]="settings.brandingConfig.logoUrl" class="ana-full" (click)="settings.brandingConfig.logoClickUrl?openWindow(settings.brandingConfig.logoClickUrl):null" [class.clickable]="settings.brandingConfig.logoClickUrl" />
             </div>
             <div class="ana-content">
                 <div class="title">{{settings.brandingConfig.agentName}}</div>
@@ -60,7 +60,7 @@
                                                 </span>
                                             </ng-container>
                                             <ng-container *ngSwitchCase="MH.MediaType.VIDEO">
-                                                <video controls="controls" class="chat-media" (click)="viewImage(msg.messageData.content.media.url)" [class.clickable]="msg.messageData.content.media.url">
+                                                <video controls="controls" class="chat-media" (click)="viewVideo(msg.messageData.content.media.url)" [class.clickable]="msg.messageData.content.media.url">
                                                     <source [src]="msg.messageData.content.media.url" />
                                                 </video>
                                                 <span class="chat-bottom-overlay">
@@ -116,7 +116,7 @@
                                                     <ng-container *ngSwitchCase="MH.MediaType.IMAGE">
                                                         <img [src]="carItem.media.url" (click)="viewImage(carItem.media.url)" [class.clickable]="carItem.media.url" />
                                                     </ng-container>
-                                                    <ng-container *ngSwitchCase="MH.MediaType.VIDEO">
+                                                    <ng-container *ngSwitchCase="MH.MediaType.VIDEO" (click)="viewVideo(carItem.media.url)" [class.clickable]="carItem.media.url">
                                                         <video controls [src]="carItem.media.url"></video>
                                                     </ng-container>
                                                     <ng-container *ngSwitchCase="MH.MediaType.AUDIO">
@@ -187,6 +187,18 @@
 <div class="image-viewer-container" [hidden]="!fullScreenImage">
     <ngx-image-viewer #imageViewer [src]="[fullScreenImage]"></ngx-image-viewer>
     <button mat-icon-button (click)="closeImageViewer()" class="btn-close">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3.748 3.748">
+            <path d="M2.205 1.874L3.68.4A.234.234 0 1 0 3.348.07L1.874 1.543.4.069A.234.234 0 1 0 .07.4l1.473 1.474L.07 3.348a.234.234 0 1 0 .331.331l1.474-1.474L3.348 3.68a.234.234 0 0 0 .331 0 .234.234 0 0 0 0-.331L2.205 1.874z" />
+        </svg>
+    </button>
+</div>
+<div class="video-viewer-container" *ngIf="fullScreenVideo">
+    <div class="video-container">
+        <video controls="controls">
+            <source [src]="fullScreenVideo" />
+        </video>
+    </div>
+    <button mat-icon-button (click)="closeVideoViewer()" class="btn-close">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3.748 3.748">
             <path d="M2.205 1.874L3.68.4A.234.234 0 1 0 3.348.07L1.874 1.543.4.069A.234.234 0 1 0 .07.4l1.473 1.474L.07 3.348a.234.234 0 1 0 .331.331l1.474-1.474L3.348 3.68a.234.234 0 0 0 .331 0 .234.234 0 0 0 0-.331L2.205 1.874z" />
         </svg>
