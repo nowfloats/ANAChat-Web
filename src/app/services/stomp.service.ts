@@ -169,10 +169,12 @@ export class StompService {
 				}
 			}
 		}
-		if (this.handleMessageReceived) {
-			if (this.msgsIds.indexOf(anaMsg.meta.id) == -1) { //handle message only if it is not already handled
-				this.msgsIds.push(anaMsg.meta.id);
-				this.handleMessageReceived(anaMsg);
+		if (anaMsg.data && Object.keys(anaMsg.data).length > 0) {
+			if (this.handleMessageReceived) {
+				if (this.msgsIds.indexOf(anaMsg.meta.id) == -1) { //handle message only if it is not already handled
+					this.msgsIds.push(anaMsg.meta.id);
+					this.handleMessageReceived(anaMsg);
+				}
 			}
 		}
 	}
