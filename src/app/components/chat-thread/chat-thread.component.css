@@ -122,6 +122,7 @@ app-chat-thread {
 }
 
 .chat-text {
+    word-wrap: break-word;
 }
 
 .chat-time {
