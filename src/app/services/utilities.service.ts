@@ -41,11 +41,11 @@ export class UtilitiesService {
 		return hours + ":" + minutes + " " + am_pm;
 	}
 
-	static getReplyMeta(srcMeta: ANAMeta, copyId?: boolean) {
+	static getReplyMeta(srcMeta: ANAMeta, copyId?: boolean, copyRespTo?: boolean) {
 		let replyMeta: ANAMeta = {
 			id: copyId ? srcMeta.id : this.uuidv4(),
 			recipient: srcMeta.sender,
-			responseTo: srcMeta.id,
+			responseTo: copyRespTo ? srcMeta.responseTo : srcMeta.id,
 			sender: srcMeta.recipient,
 			senderType: SenderType.USER,
 			sessionId: srcMeta.sessionId,

@@ -156,7 +156,7 @@ export class StompService {
 	private msgsIds: string[] = [];
 	private onMessage = (messageBody: any) => {
 		let anaMsg = new ANAChatMessage(messageBody);
-		if (!anaMsg.data || Object.keys(anaMsg.data).length <= 0) {
+		if (anaMsg.data && Object.keys(anaMsg.data).length > 0) {
 			this.sendMessageReceivedAck(anaMsg.meta);
 		}
 		if (anaMsg.events && anaMsg.events.length > 0) {
@@ -213,7 +213,7 @@ export class StompService {
 
 	sendMessageReceivedAck(meta: ANAMeta) {
 		let msg = new ANAChatMessage({
-			meta: UtilitiesService.getReplyMeta(meta, true),
+			meta: UtilitiesService.getReplyMeta(meta, false, true),
 			events: [{
 				type: EventType.ACK
 			}]
