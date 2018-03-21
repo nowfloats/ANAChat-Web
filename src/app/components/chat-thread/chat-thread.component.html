@@ -127,9 +127,7 @@
                                             <div class="carousel-item-title text-wrap">
                                                 {{carItem.title}}
                                             </div>
-                                            <div class="carousel-item-desc text-wrap">
-                                                {{carItem.desc}}
-                                            </div>
+                                            <div class="carousel-item-desc text-wrap" [innerHTML]="carItem.desc"></div>
                                         </div>
                                         <div class="carousel-item-button-container">
                                             <div class="carousel-item-button" *ngFor="let carBtn of carItem.options">

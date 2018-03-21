@@ -198,7 +198,7 @@ export class StompService {
 
 	typingBusy = false;
 	sendTypingMessage(meta: ANAMeta) {
-		if (this.typingBusy) {
+		if (this.typingBusy || !this.client) {
 			return;
 		}
 		this.typingBusy = true;
