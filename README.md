@@ -81,6 +81,8 @@ ana-current-session-only="false" or "true"
 Show or hide 'Powered by Ana':
 ana-show-branding="true" or "false"
 
+Enable chat message sounds:
+ana-msg-sounds="false" or "true"
 ```
 
 **Manual Initialization**
