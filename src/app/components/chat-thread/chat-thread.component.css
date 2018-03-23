@@ -472,7 +472,7 @@ bg white
     display: flex;
     flex-direction: column;
     float: left;
-    width: 70%;
+    width: 63%;
 }
 
     .ana-content > .title {
@@ -487,7 +487,8 @@ bg white
     }
 
 .ana-actions {
-    display: inline;
+    display: flex;
+    flex-direction: row;
     float: right;
     margin-top: 5px;
 }
@@ -514,6 +515,11 @@ bg white
             .ana-actions .ana-action svg path {
                 fill: #fff;
             }
+
+        .ana-actions .ana-action.refresh svg {
+            height: 14px;
+            width: 14px;
+        }
 
 .ana-minmax-btn {
     border-radius: 3px;

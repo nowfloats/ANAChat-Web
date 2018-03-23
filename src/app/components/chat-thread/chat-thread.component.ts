@@ -13,7 +13,6 @@ import { UtilitiesService, Config } from '../../services/utilities.service';
 import { ChainDelayService } from '../../services/chain-delay.service';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { InfoDialogService } from '../../services/info-dialog.service';
-//import { ImageViewerComponent } from 'ngx-image-viewer/src/app/image-viewer/image-viewer.component';
 
 @Component({
 	selector: 'app-chat-thread',
@@ -52,6 +51,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 	chatInput: vm.ChatInputVM;
 	settings: config.AppSettings;
 	isMin: boolean = false;
+	isMute: boolean = false;
 
 	fullScreenImage: string | SafeUrl;
 	fullScreenVideo: string | SafeUrl;
@@ -295,7 +295,7 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 					this.chainDelayService.delay((queueLength) => {
 						let msg = new vm.ChatMessageVM(message, vm.Direction.Incoming, "");
 						this.chatThread.addMessage(msg);
-
+						this.notifyNewMsg();
 						if (message.data.type == models.MessageType.CAROUSEL) {
 							let carItemsWithOptions = msg.carouselMessageData().content.items.filter(x => x.options && x.options.length > 0).length;
 							if (carItemsWithOptions > 0) //Hide the fixed input textbox if carousel has options
@@ -316,6 +316,13 @@ export class ChatThreadComponent implements OnInit, AfterViewInit {
 		let oldMsgIdx = this.chatThread.messages.findIndex(x => x.messageAckId == Config.consecutiveErrorsMessageAckId);
 		if (oldMsgIdx != -1)
 			this.chatThread.messages.splice(oldMsgIdx, 1);
+	}
+
+	notifyNewMsg() {
+		if (this.settings.appConfig.msgSounds && document.visibilityState != 'visible' && !this.isMute) {
+			let audio = new Audio('assets/sounds/new-msg.mp3');
+			audio.play();
+		}
 	}
 
 	openWindow(url: string | SafeUrl) {

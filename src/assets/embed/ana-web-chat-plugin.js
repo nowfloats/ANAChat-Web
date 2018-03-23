@@ -42,6 +42,7 @@
 			let businessId = base.getAttr(script, "businessid");
 			let apiEndpoint = base.getAttr(script, "api-endpoint");
 			let logoClickUrl = base.getAttr(script, "logo-action-url");
+			let msgSounds = base.getAttr(script, "msg-sounds") || false;
 			let autoOpen = base.getAttr(script, "auto-open");
 			let allowFlowReset = (base.getAttr(script, "allow-chat-reset") === 'true' ? true : false);
 			let htmlMessages = (base.getAttr(script, "html-messages") === 'true' ? true : false);
@@ -102,7 +103,8 @@
 				initVerbs: initVerbs,
 				htmlMessages: htmlMessages,
 				allowFlowReset: allowFlowReset,
-				fullpage: fullpage
+				fullpage: fullpage,
+				msgSounds: msgSounds
 			};
 			let thirdPartyConfig = {
 				googleMapsKey: base.getAttr(script, "gmaps-key")
@@ -116,7 +118,7 @@
 					appConfig,
 					thirdPartyConfig
 				};
-				iframeUrl = base.getAttr(script, "iframe-src") + "?sim=" + btoa(JSON.stringify(settings));
+				iframeUrl = base.getAttr(script, "iframe-src") + "?s=" + btoa(JSON.stringify(settings));
 			} else {
 				settings = {
 					stompConfig,

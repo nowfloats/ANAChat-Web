@@ -134,7 +134,7 @@ path.send-button{
 }
 
 .ana-actions {
-  margin-right: ${UtilitiesService.settings.appConfig.fullpage ? "-5px" : "20px"};
+  margin-right: ${UtilitiesService.settings.appConfig.fullpage ? "-5px" : "15px"};
 }
 `;
 		this.matCSS.loadCustomMatTheme(accent, customStyle, appCSS);
