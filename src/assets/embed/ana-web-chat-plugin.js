@@ -33,7 +33,61 @@
 		getAttr: (script, attr) => {
 			return (script.getAttribute('ana-' + attr) || script.getAttribute('data-' + attr));
 		},
-		main: (givenCustomerId, initVerbs) => {
+		deeplinkHandler: null,
+		initScript: () => {
+			var minMaxClickHandler = () => {
+				var minBtn = document.getElementById('ana-min-btn');
+				var maxBtn = document.getElementById('ana-max-btn');
+				let anaRoot = document.getElementById('ana-root');
+				if (!anaRoot.classList.contains('ana-min')) {
+					anaRoot.classList.add('ana-min');
+					minBtn.classList.remove('ana-max');
+					maxBtn.classList.remove('ana-max');
+					anaRoot.classList.remove('maximizeAnimation');
+					anaRoot.classList.add('minimizeAnimation');
+				} else {
+					anaRoot.classList.remove('ana-min');
+					minBtn.classList.add('ana-max');
+					maxBtn.classList.add('ana-max');
+					anaRoot.classList.add('maximizeAnimation');
+					anaRoot.classList.remove('ana-hidden');
+					anaRoot.classList.remove('minimizeAnimation');
+				}
+			};
+
+			document.getElementById('ana-min-btn').addEventListener('click', minMaxClickHandler);
+			document.getElementById('ana-max-btn').addEventListener('click', minMaxClickHandler);
+
+			window.onmessage = function (event) {
+				if (event.data && event.data.type && event.data.type == "LOADED")
+					document.getElementsByClassName("ana-loading-overlay")[0].style.display = "none";
+				if (event.data && event.data.type && event.data.type == "DEEPLINK") {
+					debugger;
+					if (base.deeplinkHandler)
+						base.deeplinkHandler(event.data.payload);
+				}
+			}
+		},
+		autoOpenSetup: (autoOpen, fullpage) => {
+			var maximize = () => {
+				var minBtn = document.getElementById('ana-min-btn');
+				var maxBtn = document.getElementById('ana-max-btn');
+				let anaRoot = document.getElementById('ana-root');
+				anaRoot.classList.remove('ana-min');
+				minBtn.classList.add('ana-max');
+				maxBtn.classList.add('ana-max');
+				anaRoot.classList.add('maximizeAnimation');
+				anaRoot.classList.remove('ana-hidden');
+				anaRoot.classList.remove('minimizeAnimation');
+			};
+
+			if (autoOpen > 0 && !fullpage) {
+				setTimeout(() => {
+					maximize();
+				}, autoOpen * 1000);
+			}
+		},
+		main: (givenCustomerId, initVerbs, deeplinkHandler) => {
 			let script = base.scriptEle();
 			let showBranding = base.getAttr(script, "show-branding") || false;
 			let fullpage = base.getAttr(script, "fullpage") || false;
@@ -43,12 +97,14 @@
 			let apiEndpoint = base.getAttr(script, "api-endpoint");
 			let logoClickUrl = base.getAttr(script, "logo-action-url");
 			let msgSounds = base.getAttr(script, "msg-sounds") || false;
-			let autoOpen = base.getAttr(script, "auto-open");
+			let autoOpen = parseInt(base.getAttr(script, "auto-open") || 0);
 			let allowFlowReset = (base.getAttr(script, "allow-chat-reset") === 'true' ? true : false);
 			let htmlMessages = (base.getAttr(script, "html-messages") === 'true' ? true : false);
 			let currentSessionOnly = (base.getAttr(script, "current-session-only") === 'false' ? false : true);
 			let flowId = base.getAttr(script, "flowid");
 			let fileUploadUrl = "";
+
+			base.deeplinkHandler = deeplinkHandler;
 
 			if (!apiEndpoint) {
 				fileUploadUrl = base.getAttr(script, "file-upload-url");
@@ -634,38 +690,6 @@
 				</div> 
 				  `;
 
-			let bodyScript = `
-				(() => {
-				var minMaxClickHandler = () => {
-					var minBtn = document.getElementById('ana-min-btn');
-					var maxBtn = document.getElementById('ana-max-btn');
-					let anaRoot = document.getElementById('ana-root');
-					if (!anaRoot.classList.contains('ana-min')) {
-						anaRoot.classList.add('ana-min');
-						minBtn.classList.remove('ana-max');
-						maxBtn.classList.remove('ana-max');
-						anaRoot.classList.remove('maximizeAnimation');
-						anaRoot.classList.add('minimizeAnimation');
-					} else {
-						anaRoot.classList.remove('ana-min');
-						minBtn.classList.add('ana-max');
-						maxBtn.classList.add('ana-max');
-						anaRoot.classList.add('maximizeAnimation');
-						anaRoot.classList.remove('ana-hidden');
-						anaRoot.classList.remove('minimizeAnimation');
-					}
-				};
-
-				document.getElementById('ana-min-btn').addEventListener('click', minMaxClickHandler);
-				document.getElementById('ana-max-btn').addEventListener('click', minMaxClickHandler);
-
-				window.onmessage = function(event) {
-					if (event.data && event.data.type && event.data.type == "LOADED")
-						document.getElementsByClassName("ana-loading-overlay")[0].style.display = "none";
-				}
-			})();
-				`;
-
 			let headStyle = document.createElement('style');
 			headStyle.innerHTML = styleInHead;
 			document.head.appendChild(headStyle);
@@ -674,24 +698,16 @@
 			divEle.innerHTML = htmlIntoBody;
 			document.body.appendChild(divEle);
 
-			let scriptEle = document.createElement('script')
-			scriptEle.innerHTML = bodyScript;
-			document.body.appendChild(scriptEle);
+			base.initScript();
 
-			var maxBtn = document.getElementById('ana-max-btn');
-			autoOpen = parseInt(autoOpen);
-			if (maxBtn && autoOpen > 0 && !fullpage) {
-				setTimeout(() => {
-					maxBtn.click();
-				}, autoOpen * 1000);
-			}
+			base.autoOpenSetup(autoOpen, fullpage);
 		}
 	}
 	let script = base.scriptEle();
 	let manualInit = base.getAttr(script, "manual-init");
 	if (manualInit == 'true') {
-		window.Ana = (customerId, initVariables) => {
-			base.main(customerId, initVariables);
+		window.Ana = (...args) => {
+			base.main(...args);
 		}
 	} else {
 		base.main();

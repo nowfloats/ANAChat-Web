@@ -380,7 +380,7 @@ export class ChatInputVM {
 				if (this.clickInput.content.inputType == models.InputType.MEDIA)
 					return 'Choose ' + models.MediaType[(<models.MediaInputContent>this.clickInput.content).mediaType].toLowerCase();
 				if (this.clickInput.content.inputType == models.InputType.LIST) {
-					if ((<models.ListInputContent>this.clickInput.content).multiple) 
+					if ((<models.ListInputContent>this.clickInput.content).multiple)
 						return 'Choose';
 					else
 						return 'Choose an option';
@@ -642,6 +642,17 @@ export class ChatInputVM {
 				let v = JSON.parse(option.value);
 				x.input.val = v.value;
 				window.open(v.url, '_blank');
+			} if (option.type == models.ButtonType.DEEPLINK) {
+				let v = JSON.parse(option.value);
+				x.input.val = v.value;
+				try {
+					if (window.parent && window.parent.postMessage) {
+						window.parent.postMessage({
+							type: "DEEPLINK",
+							payload: v.url
+						}, "*");
+					}
+				} catch (e) { console.error(e); }
 			} else
 				x.input.val = option.value;
 

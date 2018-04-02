@@ -56,6 +56,7 @@ export enum MediaType {
 }
 
 export enum ButtonType {
+	DEEPLINK = 3,
 	ACTION = 2,
 	QUICK_REPLY = 1,
 	URL = 0
