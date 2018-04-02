@@ -1,6 +1,6 @@
 {
   "name": "ana-web-chat",
-  "version": "0.4.9",
+  "version": "0.4.10",
   "license": "GNU-GPLv3",
   "scripts": {
     "ng": "ng",
