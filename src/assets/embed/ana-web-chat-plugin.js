@@ -62,7 +62,6 @@
 				if (event.data && event.data.type && event.data.type == "LOADED")
 					document.getElementsByClassName("ana-loading-overlay")[0].style.display = "none";
 				if (event.data && event.data.type && event.data.type == "DEEPLINK") {
-					debugger;
 					if (base.deeplinkHandler)
 						base.deeplinkHandler(event.data.payload);
 				}
