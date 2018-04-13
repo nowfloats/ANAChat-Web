@@ -87,6 +87,14 @@ export class ComplexInputComponent implements OnInit, AfterViewInit {
 			return [this.selectedListItem];
 	}
 
+	listItemsSearch: string;
+	searchedListValues() {
+		if (this.listItemsSearch) {
+			return this.listValues.filter(x => x.text && x.text.toLowerCase().includes(this.listItemsSearch.toLowerCase()))
+		}
+		return this.listValues;
+	}
+
 	isValid(): boolean {
 		switch (this.params.Type) {
 			case ComplexType.Address:
