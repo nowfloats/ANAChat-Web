@@ -1,0 +1,28 @@
+language: node_js
+node_js:
+  - "7"
+
+sudo: true
+dist: trusty
+
+branches:
+  only:
+    - travisci    #Master only builds for prod. For now changing it to Travis CI Branch
+                  #dev branch push will triger build for non prod deployment
+
+before_script:
+  - npm install -g firebase-tools
+  - npm install
+
+script:
+  - ng build --prod
+
+# after_success:
+#   - firebase deploy --token $FIREBASE_TOKEN
+
+notifications:
+  email:
+    - soumyajit.dutta@nowfloats.com
+  slack:
+    on_success: always
+    on_failure: always
